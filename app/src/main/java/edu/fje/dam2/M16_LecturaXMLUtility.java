@@ -16,7 +16,7 @@ import java.util.List;
  * Classe que llegeix un XML contingut en l'aplicació
  *
  * @author sergi.grau@fje.edu
- * @version 5.0 27.01.2020
+ * @version 6.0 (API 33) 19.04.2026
  */
 public class M16_LecturaXMLUtility {
     private static final String ns = null;

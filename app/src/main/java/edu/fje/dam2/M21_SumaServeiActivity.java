@@ -15,6 +15,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+/**
+ * Classe que demostra el funcionament dels serveis a Android
+ * Disposa d'una classe d'utilitat per a facilitar la manipulació de la taula
+ * per detectar els canvis afegeix   android:configChanges="orientation|screenSize
+ * a l'activity en el manifest
+ *  * @author sergi.grau@fje.edu
+ *  * @version 6.0 (API 33) 19.04.2026
+ */
 public class M21_SumaServeiActivity extends AppCompatActivity {
 
     private Intent intent;

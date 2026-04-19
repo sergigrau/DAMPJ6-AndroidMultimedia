@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * l'activity en el manifest
  *
  * @author sergi.grau@fje.edu
- * @version 5.0 27.01.2020
+ * @version 6.0 (API 33) 19.04.2026
  */
 @SuppressLint("ValidFragment")
 public class M17_FragmentsActivity extends AppCompatActivity

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<curs>
+    <alumne dni="123456789">
+        <nom>sergi</nom>
+        <cognom>grau</cognom>
+    </alumne>
+    <alumne dni="111111111">
+        <nom>joan</nom>
+        <cognom>bonalumne</cognom>
+    </alumne>
+</curs>

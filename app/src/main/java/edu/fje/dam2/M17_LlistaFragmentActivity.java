@@ -13,7 +13,7 @@ import android.widget.ListView;
  * Classe que hereta de fragment
  *
  * @author sergi.grau@fje.edu
- * @version 5.0 27.01.2020
+ * @version 6.0 (API 33) 19.04.2026
  */
 public class M17_LlistaFragmentActivity extends Fragment {
 

@@ -36,7 +36,10 @@ public class M14_ImatgeDeSDActivity extends AppCompatActivity {
                     Uri seleccio = result.getData().getData();
                     try {
                         // Usar ContentResolver amb Uri en lloc de ruta de fitxer (deprecated)
-                        InputStream inputStream = getContentResolver().openInputStream(seleccio);
+                        InputStream inputStream = null;
+                        if (seleccio != null) {
+                            inputStream = getContentResolver().openInputStream(seleccio);
+                        }
                         Bitmap imatge = BitmapFactory.decodeStream(inputStream);
                         imageView.setImageBitmap(imatge);
                     } catch (Exception e) {

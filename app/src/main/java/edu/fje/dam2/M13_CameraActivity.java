@@ -17,7 +17,6 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 
@@ -48,11 +47,10 @@ import java.util.List;
  * Activity que permet l'accés directament al dispositiu de càmera
  *
  * @author sergi.grau@fje.edu
- * @version 5.0 27.01.2020
+ * @version 6.0 10.04.2026
  */
 public class M13_CameraActivity extends AppCompatActivity {
     private static final String TAG = "M11";
-    private Button prendreFoto;
     private TextureView vistaTextura;
     private static final SparseIntArray ORIENTACIONS = new SparseIntArray();
 
@@ -63,16 +61,13 @@ public class M13_CameraActivity extends AppCompatActivity {
         ORIENTACIONS.append(Surface.ROTATION_270, 180);
     }
 
-    private String cameraId;
     protected CameraDevice dispositiuCamera;
     protected CameraCaptureSession sessionsCamera;
-    protected CaptureRequest captureRequest;
     protected CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
     private ImageReader imageReader;
     private File file;
     private static final int PETICIO_PERMIS_CAMARA = 200;
-    private boolean mFlashSupported;
     private Handler filHandler;
     private HandlerThread fil;
 
@@ -83,7 +78,7 @@ public class M13_CameraActivity extends AppCompatActivity {
         vistaTextura =  findViewById(R.id.texture);
         assert vistaTextura != null;
         vistaTextura.setSurfaceTextureListener(texturaListener);
-        prendreFoto = findViewById(R.id.btn_takepicture);
+        Button prendreFoto = findViewById(R.id.btn_takepicture);
         assert prendreFoto != null;
         prendreFoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,21 +90,21 @@ public class M13_CameraActivity extends AppCompatActivity {
 
     TextureView.SurfaceTextureListener texturaListener = new TextureView.SurfaceTextureListener() {
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
             obrirCamara();
         }
 
         @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
         }
 
         @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
             return false;
         }
 
         @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
         }
     };
     private final CameraDevice.StateCallback estatCallback = new CameraDevice.StateCallback() {
@@ -166,9 +161,7 @@ public class M13_CameraActivity extends AppCompatActivity {
         try {
             CameraCharacteristics caracteristiques = manager.getCameraCharacteristics(dispositiuCamera.getId());
             Size[] mides = null;
-            if (caracteristiques != null) {
-                mides = caracteristiques.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
-            }
+            mides = caracteristiques.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
             int ample = 640;
             int altura = 480;
             if (mides != null && 0 < mides.length) {
@@ -191,9 +184,7 @@ public class M13_CameraActivity extends AppCompatActivity {
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
-                    Image imatge = null;
-                    try {
-                        imatge = reader.acquireLatestImage();
+                    try (Image imatge = reader.acquireLatestImage()) {
                         ByteBuffer buffer = imatge.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
@@ -202,22 +193,12 @@ public class M13_CameraActivity extends AppCompatActivity {
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } finally {
-                        if (imatge != null) {
-                            imatge.close();
-                        }
                     }
                 }
 
                 private void desar(byte[] bytes) throws IOException {
-                    OutputStream output = null;
-                    try {
-                        output = new FileOutputStream(fitxer);
+                    try (OutputStream output = new FileOutputStream(fitxer)) {
                         output.write(bytes);
-                    } finally {
-                        if (null != output) {
-                            output.close();
-                        }
                     }
                 }
             };
@@ -257,7 +238,7 @@ public class M13_CameraActivity extends AppCompatActivity {
             Surface surface = new Surface(textura);
             captureRequestBuilder = dispositiuCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(surface);
-            dispositiuCamera.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+            dispositiuCamera.createCaptureSession(List.of(surface), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     if (null == dispositiuCamera) {
@@ -281,7 +262,7 @@ public class M13_CameraActivity extends AppCompatActivity {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         Log.e(TAG, "camara oberta");
         try {
-            cameraId = manager.getCameraIdList()[0];
+            String cameraId = manager.getCameraIdList()[0];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
@@ -310,19 +291,9 @@ public class M13_CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void tancarCamara() {
-        if (null != dispositiuCamera) {
-            dispositiuCamera.close();
-            dispositiuCamera = null;
-        }
-        if (null != imageReader) {
-            imageReader.close();
-            imageReader = null;
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PETICIO_PERMIS_CAMARA) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(M13_CameraActivity.this, "calen permisos", Toast.LENGTH_LONG).show();

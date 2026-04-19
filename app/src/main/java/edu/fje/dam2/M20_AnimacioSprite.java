@@ -8,6 +8,14 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+/**
+ * Classe que demostra el funcionament de les animacions a Android
+ * Disposa d'una classe d'utilitat per a facilitar la manipulació de la taula
+ * per detectar els canvis afegeix   android:configChanges="orientation|screenSize
+ * a l'activity en el manifest
+ * @author sergi.grau@fje.edu
+ * @version 6.0 (API 33) 19.04.2026
+ */
 public class M20_AnimacioSprite extends AppCompatActivity {
 
     AnimationDrawable a;
@@ -16,9 +24,6 @@ public class M20_AnimacioSprite extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.m20_animacio_sprite);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         ImageView imatge = (ImageView) findViewById(R.id.spriteImatge);
         imatge.setBackgroundResource(R.drawable.sprite);
