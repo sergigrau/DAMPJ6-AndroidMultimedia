@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="M06_VistaPropia">
+        <attr name="x" format="float">
+        </attr>
+        <attr name="y" format="float">
+        </attr>
+        <attr name="cadena" format="string">
+        </attr>
+    </declare-styleable>
+</resources>

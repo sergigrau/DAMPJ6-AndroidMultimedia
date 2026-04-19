@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#bfb0b0" >
+
+    <EditText
+        android:id="@+id/textEntrada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name"
+        android:tooltipText="entra un curs" />
+
+    <Button
+        android:id="@+id/botoEntrada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="entra nom" />
+</LinearLayout>
