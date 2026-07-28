@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DAMPJ6AndroidMultimedia">
         <activity
-            android:name=".M16_LecturaXMLActivity"
+            android:name=".M01_AudioActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
