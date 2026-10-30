@@ -1,7 +1,6 @@
-# M11 – Animació seqüencial amb AnimatorSet
+# M11 – Sequential Animation with AnimatorSet
 
-Vegeu la documentació completa a la pàgina [M10 – Animació bàsica](M10-Animacio-Basica), on es tracten conjuntament M10 i M11.
+See the full documentation on the [M10 – Basic Animation](M10-Animacio-Basica) page, where M10 and M11 are covered together.
 
 ---
-[← M10](M10-Animacio-Basica) | [Inici](Home) | [M12 →](M12-Camera-Intent)
-
+[M10](M10-Animacio-Basica) | [Home](Home) | [M12](M12-Camera-Intent)

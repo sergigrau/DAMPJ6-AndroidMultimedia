@@ -1,32 +1,32 @@
-# M12 – Càmera per Intent
+# M12 – Camera via Intent
 
-## 🎯 Objectiu
-Aprendre a capturar una foto usant l'aplicació de càmera del sistema a través d'un `Intent` (`ACTION_IMAGE_CAPTURE`), gestionant el resultat amb el modern `ActivityResultLauncher` (substitut del deprecated `startActivityForResult`).
+## Objective
+Learn how to capture a photo using the system camera application through an `Intent` (`ACTION_IMAGE_CAPTURE`), handling the result with the modern `ActivityResultLauncher` (replacement for the deprecated `startActivityForResult`).
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M12_CameraIntentActivity.kt` | Activity principal |
-| `res/layout/m13_camera_intent.xml` | Layout amb Button i ImageView |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M12_CameraIntentActivity.kt` | Main activity |
+| `res/layout/m13_camera_intent.xml` | Layout with Button and ImageView |
 
-## 🔑 Conceptes clau
+## Key Concepts
 
-### ActivityResultLauncher (API moderna)
-`startActivityForResult()` i `onActivityResult()` van ser **deprecats**. L'alternativa és `ActivityResultLauncher`:
+### ActivityResultLauncher (Modern API)
+`startActivityForResult()` and `onActivityResult()` were **deprecated**. The alternative is `ActivityResultLauncher`:
 
 ```kotlin
-// 1. Registrar el launcher ABANS d'onCreate (com a propietat de classe)
+// 1. Register the launcher BEFORE onCreate (as a class property)
 private val capturaImatgeLauncher: ActivityResultLauncher<Intent> =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK && result.data != null) {
-            // La foto retorna com a Bitmap petit al extra "data"
+            // The photo is returned as a small Bitmap in the "data" extra
             val imageBitmap = result.data!!.extras?.getParcelable("data", Bitmap::class.java)
-            imatge.setImageBitmap(imageBitmap)
+            imageView.setImageBitmap(imageBitmap)
         }
     }
 
-// 2. Llançar la càmera
-private fun fesFoto() {
+// 2. Launch the camera
+private fun takePicture() {
     val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
     if (takePictureIntent.resolveActivity(packageManager) != null) {
         capturaImatgeLauncher.launch(takePictureIntent)
@@ -34,59 +34,58 @@ private fun fesFoto() {
 }
 ```
 
-### Gestió de permisos amb ActivityResultLauncher
+### Permission Handling with ActivityResultLauncher
 ```kotlin
 private val requestCameraPermissionLauncher: ActivityResultLauncher<String> =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) fesFoto()
-        else Toast.makeText(this, "Permís de càmera denegat", Toast.LENGTH_SHORT).show()
+        if (isGranted) takePicture()
+        else Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
     }
 
-// Comprovar i sol·licitar permís
-boto.setOnClickListener {
+// Check and request permission
+button.setOnClickListener {
     if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA)
         != PackageManager.PERMISSION_GRANTED) {
         requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         return@setOnClickListener
     }
-    fesFoto()
+    takePicture()
 }
 ```
 
-### Comparativa mètodes antics vs nous
-| Mètode antic (deprecated) | Mètode nou |
-|--------------------------|-----------|
+### Old vs New Methods Comparison
+| Old method (deprecated) | New method |
+|-------------------------|-----------|
 | `startActivityForResult(intent, code)` | `launcher.launch(intent)` |
-| `onActivityResult(code, result, data)` | Callback del `registerForActivityResult` |
+| `onActivityResult(code, result, data)` | Callback of `registerForActivityResult` |
 | `requestPermissions(array, code)` | `permissionLauncher.launch(permission)` |
-| `onRequestPermissionsResult(...)` | Callback del launcher de permisos |
+| `onRequestPermissionsResult(...)` | Callback of the permission launcher |
 
-### Permisos necessaris
+### Required Permissions
 ```xml
 <!-- AndroidManifest.xml -->
 <uses-permission android:name="android.permission.CAMERA" />
 
-<!-- A partir d'API 33, no cal WRITE_EXTERNAL_STORAGE per a la càmera -->
+<!-- From API 33, WRITE_EXTERNAL_STORAGE is not needed for the camera -->
 ```
 
-### Limitació del thumbnail
-`ACTION_IMAGE_CAPTURE` retorna un **thumbnail** petit (no la foto en resolució completa) al extra `"data"`. Per guardar la foto en alta resolució, cal proporcionar un `Uri` de destí:
+### Thumbnail Limitation
+`ACTION_IMAGE_CAPTURE` returns a small **thumbnail** (not a full-resolution photo) in the `"data"` extra. To save the photo in high resolution, a destination `Uri` must be provided:
 
 ```kotlin
-// Per alta resolució (fora de l'abast d'aquest exercici)
+// For high resolution (outside the scope of this exercise)
 val photoUri = FileProvider.getUriForFile(this, "edu.fje.dam2.provider", photoFile)
 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
 ```
 
-## 🆚 Diferència entre M12 i M13
+## Difference Between M12 and M13
 | | M12 (Intent) | M13 (Camera2 API) |
 |---|---|---|
-| **Complexitat** | ✅ Simple | ⚠️ Complex |
-| **Control** | ❌ Limitat | ✅ Total |
-| **Resolució** | Thumbnail | Màxima |
-| **App de càmera** | Sistema | Pròpia |
-| **Ús recomanat** | Apps generals | Apps especialitzades |
+| **Complexity** | Simple | Complex |
+| **Control** | Limited | Full |
+| **Resolution** | Thumbnail | Maximum |
+| **Camera app** | System | Own |
+| **Recommended for** | General apps | Specialised apps |
 
 ---
-[← M11](M11-Animacio-Requadre) | [Inici](Home) | [M13 →](M13-Camera-API)
-
+[M11](M11-Animacio-Requadre) | [Home](Home) | [M13](M13-Camera-API)

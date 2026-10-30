@@ -1,28 +1,28 @@
 # M18 – Firebase Realtime Database
 
-## 🎯 Objectiu
-Aprendre a integrar **Firebase Realtime Database** en una aplicació Android per emmagatzemar, llegir i mostrar dades en temps real al núvol, sense autenticació. Implementa un CRUD bàsic d'artistes musicals.
+## Objective
+Learn how to integrate **Firebase Realtime Database** into an Android application to store, read and display data in real time in the cloud, without authentication. Implements a basic CRUD for musical artists.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M18_Firebase_Artistes.kt` | Activity principal amb llista i formulari |
-| `M18_Artista.kt` | Data class de l'entitat Artista |
-| `M18_Llista.kt` | Adaptador personalitzat del ListView |
-| `res/layout/m18_firebase.xml` | Layout principal |
-| `res/layout/m18_llista.xml` | Layout de cada element de la llista |
-| `google-services.json` | Credencials de Firebase (no inclòs al repo) |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M18_Firebase_Artistes.kt` | Main activity with list and form |
+| `M18_Artista.kt` | Artist entity data class |
+| `M18_Llista.kt` | Custom ListView adapter |
+| `res/layout/m18_firebase.xml` | Main layout |
+| `res/layout/m18_llista.xml` | Layout for each list item |
+| `google-services.json` | Firebase credentials (not included in repo) |
 
-## 🔑 Conceptes clau
+## Key Concepts
 
-### Configuració de Firebase
-1. Crear un projecte a [Firebase Console](https://console.firebase.google.com/)
-2. Afegir una app Android amb el package `edu.fje.dam2`
-3. Descarregar `google-services.json` i col·locar-lo a `app/`
-4. Habilitar **Realtime Database** en mode test
+### Firebase Setup
+1. Create a project at [Firebase Console](https://console.firebase.google.com/).
+2. Add an Android app with the package `edu.fje.dam2`.
+3. Download `google-services.json` and place it in `app/`.
+4. Enable **Realtime Database** in test mode.
 
-### Data class amb Firebase
-Firebase necessita una classe amb un **constructor sense arguments** i propietats públiques:
+### Data Class with Firebase
+Firebase requires a class with a **no-argument constructor** and public properties:
 
 ```kotlin
 @IgnoreExtraProperties
@@ -31,63 +31,63 @@ data class M18_Artista(
     val nom: String = "",
     val genere: String = ""
 )
-// Kotlin data class amb valors per defecte = constructor implícit sense args ✅
+// Kotlin data class with default values = implicit no-arg constructor
 ```
 
-> `@IgnoreExtraProperties` fa que Firebase ignori camps de la BD que no existeixin a la classe.
+> `@IgnoreExtraProperties` tells Firebase to ignore database fields that do not exist in the class.
 
-### Referència a la base de dades
+### Database Reference
 
 ```kotlin
-// Obtenir referència al node "artistes"
+// Get a reference to the "artistes" node
 val DBArtistes: DatabaseReference = FirebaseDatabase.getInstance().getReference("artistes")
 ```
 
-### Llegir dades en temps real (ValueEventListener)
+### Reading Data in Real Time (ValueEventListener)
 ```kotlin
 DBArtistes.addValueEventListener(object : ValueEventListener {
     override fun onDataChange(dataSnapshot: DataSnapshot) {
-        artistes.clear()
+        artists.clear()
         for (postSnapshot in dataSnapshot.children) {
-            val artista = postSnapshot.getValue(M18_Artista::class.java)
-            artista?.let { artistes.add(it) }
+            val artist = postSnapshot.getValue(M18_Artista::class.java)
+            artist?.let { artists.add(it) }
         }
-        // Actualitzar la UI
-        llistaArtistes.adapter = M18_Llista(this@M18_Firebase_Artistes, artistes)
+        // Update the UI
+        listView.adapter = M18_Llista(this@M18_Firebase_Artistes, artists)
     }
 
     override fun onCancelled(databaseError: DatabaseError) {
-        // Gestionar error
+        // Handle error
     }
 })
 ```
 
-**Diferència entre listeners:**
-| Listener | Quan s'activa |
-|----------|--------------|
-| `addValueEventListener` | En cada canvi (temps real) |
-| `addListenerForSingleValueEvent` | Una sola vegada |
+**Listener types:**
+| Listener | When triggered |
+|----------|---------------|
+| `addValueEventListener` | On every change (real time) |
+| `addListenerForSingleValueEvent` | Only once |
 
-### Escriure dades (push + setValue)
+### Writing Data (push + setValue)
 
 ```kotlin
-private fun afegirArtista() {
-    val nomText = nom.text.toString().trim()
-    val genereText = genere.selectedItem.toString()
+private fun addArtist() {
+    val nameText = nameField.text.toString().trim()
+    val genreText = genreSpinner.selectedItem.toString()
 
-    if (nomText.isNotEmpty()) {
-        // push() genera una clau única
+    if (nameText.isNotEmpty()) {
+        // push() generates a unique key
         val id = DBArtistes.push().key
 
         if (id != null) {
-            val artista = M18_Artista(id, nomText, genereText)
-            DBArtistes.child(id).setValue(artista)  // Escriu a /artistes/{id}
+            val artist = M18_Artista(id, nameText, genreText)
+            DBArtistes.child(id).setValue(artist)  // Writes to /artistes/{id}
         }
     }
 }
 ```
 
-**Estructura a Firebase:**
+**Firebase database structure:**
 ```json
 {
   "artistes": {
@@ -99,41 +99,41 @@ private fun afegirArtista() {
     "-NxKjhXYZ456": {
       "id": "-NxKjhXYZ456",
       "nom": "Mozart",
-      "genere": "Clàssica"
+      "genere": "Classical"
     }
   }
 }
 ```
 
-### Adaptador personalitzat M18_Llista
+### Custom Adapter M18_Llista
 
 ```kotlin
-class M18_Llista(private val context: Activity, private val artistes: List<M18_Artista>) :
-    ArrayAdapter<M18_Artista>(context, R.layout.m18_llista, artistes) {
+class M18_Llista(private val context: Activity, private val artists: List<M18_Artista>) :
+    ArrayAdapter<M18_Artista>(context, R.layout.m18_llista, artists) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val listViewItem = context.layoutInflater.inflate(R.layout.m18_llista, null, true)
-        val nom: TextView     = listViewItem.findViewById(R.id.nom)
-        val genere: TextView  = listViewItem.findViewById(R.id.genere)
-        val artist = artistes[position]
-        nom.text    = artist.nom
-        genere.text = artist.genere
+        val name: TextView  = listViewItem.findViewById(R.id.nom)
+        val genre: TextView = listViewItem.findViewById(R.id.genere)
+        val artist = artists[position]
+        name.text  = artist.nom
+        genre.text = artist.genere
         return listViewItem
     }
 }
 ```
 
 ### Firebase BOM (Bill of Materials)
-El BOM sincronitza automàticament les versions de totes les biblioteques Firebase:
+The BOM automatically synchronises the versions of all Firebase libraries:
 
 ```kotlin
 // build.gradle.kts
 implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-implementation("com.google.firebase:firebase-database")  // Sense versió explícita
+implementation("com.google.firebase:firebase-database")  // No explicit version needed
 ```
 
-## 🔒 Regles de seguretat Firebase
-Per a tests (sense autenticació):
+## Firebase Security Rules
+For testing (no authentication):
 ```json
 {
   "rules": {
@@ -143,16 +143,15 @@ Per a tests (sense autenticació):
 }
 ```
 
-> ⚠️ **Atenció**: aquestes regles permeten accés públic. En producció, cal autenticació.
+> These rules allow public access. In production, authentication is required.
 
-## 📊 Operacions CRUD a Firebase
-| Operació | Mètode |
-|----------|--------|
+## Firebase CRUD Operations
+| Operation | Method |
+|-----------|--------|
 | **Create** | `ref.push().setValue(obj)` |
 | **Read** | `ref.addValueEventListener(...)` |
 | **Update** | `ref.child(id).updateChildren(map)` |
 | **Delete** | `ref.child(id).removeValue()` |
 
 ---
-[← M17](M17-Fragments) | [Inici](Home) | [M19 →](M19-Animacio-Descriptor)
-
+[M17](M17-Fragments) | [Home](Home) | [M19](M19-Animacio-Descriptor)

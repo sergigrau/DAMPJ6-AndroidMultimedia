@@ -1,26 +1,26 @@
-# M02 – Àudio en segon pla amb Service
+# M02 – Background Audio with Service
 
-## 🎯 Objectiu
-Aprendre a reproduir àudio en segon pla mitjançant un `Service` Android, de manera que la música continuï sonant encara que l'usuari tanqui l'Activity o navegui a una altra aplicació.
+## Objective
+Learn how to play audio in the background using an Android `Service`, so the music keeps playing even when the user closes the Activity or navigates to another application.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M02_AudioIntentService.kt` | Service que gestiona el MediaPlayer |
-| `M02_AudioServiceActivity.kt` | Activity que envia ordres al Service |
-| `res/layout/m01_audio_principal.xml` | Layout reutilitzat de M01 |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M02_AudioIntentService.kt` | Service that manages the MediaPlayer |
+| `M02_AudioServiceActivity.kt` | Activity that sends commands to the Service |
+| `res/layout/m01_audio_principal.xml` | Layout reused from M01 |
 
-## 🔑 Conceptes clau
+## Key Concepts
 
 ### Service vs Activity
 | | Activity | Service |
 |---|---|---|
-| **Visible** | Sí | No |
-| **Cicle de vida** | Lligat a la UI | Independent |
-| **Àudio en segon pla** | ❌ | ✅ |
-| **Destrucció al sortir** | Sí | Configurable |
+| **Visible** | Yes | No |
+| **Lifecycle** | Tied to the UI | Independent |
+| **Background audio** | No | Yes |
+| **Destroyed on exit** | Yes | Configurable |
 
-### Estructura del Service
+### Service Structure
 
 ```kotlin
 class M02_AudioIntentService : Service() {
@@ -32,8 +32,8 @@ class M02_AudioIntentService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getStringExtra("operacio")?.let { operacio ->
-            when (operacio) {
+        intent?.getStringExtra("operacio")?.let { operation ->
+            when (operation) {
                 "inici" -> if (mp?.isPlaying == false) mp?.start()
                 "pausa" -> if (mp?.isPlaying == true) mp?.pause()
                 "salta" -> mp?.seekTo(10000)
@@ -51,51 +51,50 @@ class M02_AudioIntentService : Service() {
 }
 ```
 
-### Comunicació Activity → Service
+### Activity to Service Communication
 
-L'Activity envia ordres al Service passant `extras` a través d'un `Intent`:
+The Activity sends commands to the Service by passing `extras` through an `Intent`:
 
 ```kotlin
-// Iniciar el Service amb una operació
+// Start the Service with an operation
 val intent = Intent(this, M02_AudioIntentService::class.java)
 intent.putExtra("operacio", "inici")
 startService(intent)
 
-// Canviar operació
+// Change operation
 intent.putExtra("operacio", "pausa")
 startService(intent)
 ```
 
-### Valors de retorn d'`onStartCommand`
-| Constant | Comportament |
-|----------|-------------|
-| `START_STICKY` | El sistema reinicia el Service si el mata (intent = null) |
-| `START_NOT_STICKY` | El sistema **no** reinicia el Service si el mata |
-| `START_REDELIVER_INTENT` | Reinicia i reentrega l'últim Intent |
+### Return values of `onStartCommand`
+| Constant | Behaviour |
+|----------|-----------|
+| `START_STICKY` | The system restarts the Service if it is killed (intent = null) |
+| `START_NOT_STICKY` | The system does NOT restart the Service if it is killed |
+| `START_REDELIVER_INTENT` | Restarts and redelivers the last Intent |
 
-### Declaració al Manifest
+### Manifest Declaration
 ```xml
 <service android:name=".M02_AudioIntentService" />
 ```
 
-## 🔄 Diagrama de comunicació
+## Communication Diagram
 
 ```
 M02_AudioServiceActivity
-        │
-        │  startService(intent.putExtra("operacio","inici"))
-        ▼
+        |
+        |  startService(intent.putExtra("operacio","inici"))
+        v
 M02_AudioIntentService
-        │
-        ├─► "inici" → mp.start()
-        ├─► "pausa" → mp.pause()
-        └─► "salta" → mp.seekTo(10000)
+        |
+        +-- "inici" -> mp.start()
+        +-- "pausa" -> mp.pause()
+        +-- "salta" -> mp.seekTo(10000)
 ```
 
-## ⚠️ Diferències amb M01
-- A M01, el MediaPlayer viu a l'Activity → s'atura quan es tanca.
-- A M02, el MediaPlayer viu al Service → continua reproduint en segon pla.
+## Differences from M01
+- In M01, the MediaPlayer lives in the Activity and stops when the Activity is closed.
+- In M02, the MediaPlayer lives in the Service and keeps playing in the background.
 
 ---
-[← M01](M01-Audio-MediaPlayer) | [Inici](Home) | [M03 →](M03-ExecutorService)
-
+[M01](M01-Audio-MediaPlayer) | [Home](Home) | [M03](M03-ExecutorService)

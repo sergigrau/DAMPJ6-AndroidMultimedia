@@ -1,49 +1,49 @@
-# DAM2.PJ6 – Android Multimedia i Serveis 📱
+# DAM2.PJ6 – Android Multimedia and Services
 
-Benvingut/da a la wiki del projecte **DAMPJ6-AndroidMultimedia**, una col·lecció d'exercicis pràctics de desenvolupament d'aplicacions Android en **Kotlin** per al mòdul de Projecte del cicle formatiu DAM2.
+Welcome to the wiki of the **DAMPJ6-AndroidMultimedia** project, a collection of practical Android development exercises in **Kotlin** for the DAM2 Project module.
 
 ---
 
-## 📚 Índex d'exercicis
+## Table of Contents
 
-| Mòdul | Títol | Conceptes clau |
-|-------|-------|----------------|
-| [M01](M01-Audio-MediaPlayer) | Reproducció d'àudio | `MediaPlayer`, `AudioFocus` |
-| [M02](M02-Audio-Service) | Àudio en segon pla | `Service`, `Intent` |
-| [M03](M03-ExecutorService) | Tasques en segon pla | `ExecutorService`, `ObjectAnimator` |
-| [M04](M04-Notificacions-SnackBar) | Notificacions SnackBar | `Snackbar`, `Toast` |
-| [M05](M05-Canvas-Basic) | Canvas bàsic | `Canvas`, `Bitmap`, `Paint` |
-| [M06](M06-Canvas-Personalitzat) | Vista personalitzada | `View`, `AttributeSet`, `onDraw` |
-| [M07](M07-Canvas-Path) | Dibuix lliure | `Path`, `MaskFilter`, `EmbossMaskFilter` |
-| [M08](M08-Alarmes) | Alarmes | `AlarmManager`, `BroadcastReceiver` |
-| [M09](M09-Propietats-Dinamiques) | Vistes dinàmiques | `LinearLayout`, `LayoutParams` |
-| [M10](M10-Animacio-Basica) | Animació bàsica | `ObjectAnimator` |
-| [M11](M11-Animacio-Requadre) | Animació seqüencial | `AnimatorSet` |
-| [M12](M12-Camera-Intent) | Càmera per intent | `ActivityResultLauncher`, `MediaStore` |
-| [M13](M13-Camera-API) | Càmera Camera2 API | `CameraDevice`, `CameraCaptureSession` |
-| [M14](M14-Imatge-SD) | Imatge de la galeria | `ContentResolver`, `BitmapFactory` |
+| Module | Title | Key Concepts |
+|--------|-------|--------------|
+| [M01](M01-Audio-MediaPlayer) | Audio Playback | `MediaPlayer`, `AudioFocus` |
+| [M02](M02-Audio-Service) | Background Audio | `Service`, `Intent` |
+| [M03](M03-ExecutorService) | Background Tasks | `ExecutorService`, `ObjectAnimator` |
+| [M04](M04-Notificacions-SnackBar) | SnackBar Notifications | `Snackbar`, `Toast` |
+| [M05](M05-Canvas-Basic) | Basic Canvas | `Canvas`, `Bitmap`, `Paint` |
+| [M06](M06-Canvas-Personalitzat) | Custom View | `View`, `AttributeSet`, `onDraw` |
+| [M07](M07-Canvas-Path) | Freehand Drawing | `Path`, `MaskFilter`, `EmbossMaskFilter` |
+| [M08](M08-Alarmes) | Alarms | `AlarmManager`, `BroadcastReceiver` |
+| [M09](M09-Propietats-Dinamiques) | Dynamic Views | `LinearLayout`, `LayoutParams` |
+| [M10](M10-Animacio-Basica) | Basic Animation | `ObjectAnimator` |
+| [M11](M11-Animacio-Requadre) | Sequential Animation | `AnimatorSet` |
+| [M12](M12-Camera-Intent) | Camera via Intent | `ActivityResultLauncher`, `MediaStore` |
+| [M13](M13-Camera-API) | Camera2 API | `CameraDevice`, `CameraCaptureSession` |
+| [M14](M14-Imatge-SD) | Image from Gallery | `ContentResolver`, `BitmapFactory` |
 | [M15](M15-OpenGL-ES-20) | OpenGL ES 2.0 | `GLSurfaceView`, `GLES20`, shaders |
-| [M16](M16-Lectura-XML) | Anàlisi XML | `XmlPullParser`, `AssetManager` |
+| [M16](M16-Lectura-XML) | XML Parsing | `XmlPullParser`, `AssetManager` |
 | [M17](M17-Fragments) | Fragments | `Fragment`, `FragmentManager` |
 | [M18](M18-Firebase) | Firebase Realtime DB | `FirebaseDatabase`, `ValueEventListener` |
-| [M19](M19-Animacio-Descriptor) | Animació per descriptor | `AnimatorInflater`, `AnimatorSet` |
-| [M20](M20-Animacio-Sprite) | Animació Sprite | `AnimationDrawable` |
-| [M21](M21-Servei-Suma) | Servei de càlcul | `Service`, `BroadcastReceiver` |
+| [M19](M19-Animacio-Descriptor) | XML Animator | `AnimatorInflater`, `AnimatorSet` |
+| [M20](M20-Animacio-Sprite) | Sprite Animation | `AnimationDrawable` |
+| [M21](M21-Servei-Suma) | Calculation Service | `Service`, `BroadcastReceiver` |
 
 ---
 
-## 🛠️ Tecnologies del projecte
+## Project Technologies
 
-- **Llenguatge:** Kotlin 2.1.0
-- **SDK mínim:** Android 13 (API 33)
-- **SDK objectiu:** Android 16 (API 36)
+- **Language:** Kotlin 2.1.0
+- **Minimum SDK:** Android 13 (API 33)
+- **Target SDK:** Android 16 (API 36)
 - **Build tool:** Android Gradle Plugin 9.1.1
-- **Base de dades:** Firebase Realtime Database 22.0.1
+- **Database:** Firebase Realtime Database 22.0.1
 - **UI:** AppCompat, Material Design 3
 
 ---
 
-## 🏗️ Estructura del projecte
+## Project Structure
 
 ```
 app/src/main/
@@ -96,15 +96,14 @@ app/src/main/
 
 ---
 
-## 🚀 Com executar el projecte
+## How to Run the Project
 
-1. Clona el repositori
-2. Obre'l amb **Android Studio Meerkat** o superior
-3. Connecta un dispositiu físic o crea un AVD amb **API 33+**
-4. Configura el fitxer `google-services.json` per als exercicis de Firebase (M18)
-5. Executa `Run > Run 'app'`
+1. Clone the repository.
+2. Open it with **Android Studio Meerkat** or later.
+3. Connect a physical device or create an AVD with **API 33+**.
+4. Place the `google-services.json` file in the `app/` folder for Firebase exercises (M18).
+5. Run `Run > Run 'app'`.
 
 ---
 
-> **Autor:** sergi.grau@fje.edu | **Versió:** 6.0 | **Curs:** 2025-2026
-
+> **Author:** sergi.grau@fje.edu | **Version:** 6.0 | **Course:** 2025-2026

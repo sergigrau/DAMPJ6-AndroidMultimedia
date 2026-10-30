@@ -1,38 +1,38 @@
-# M07 – Dibuix lliure amb Path i Paint
+# M07 – Freehand Drawing with Path and Paint
 
-## 🎯 Objectiu
-Implementar una aplicació de dibuix lliure on l'usuari pot pintar amb el dit sobre la pantalla, aplicant efectes visuals com relleu (`EmbossMaskFilter`) i difuminat (`BlurMaskFilter`). Introdueix la classe `Path` per traçar corbes Bézier.
+## Objective
+Implement a freehand drawing application where the user can paint with their finger on the screen, applying visual effects such as emboss (`EmbossMaskFilter`) and blur (`BlurMaskFilter`). Introduces the `Path` class for drawing quadratic Bezier curves.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M07_CanvasPath.kt` | Activity principal amb menú d'efectes |
-| `M07_VistaPaint.kt` | View personalitzada que gestiona el dibuix |
-| `M07_PathDit.kt` | Data class que representa un traç individual |
-| `res/menu/m07_menu.xml` | Menú: Relleu / Difuminat / Neteja |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M07_CanvasPath.kt` | Main activity with effects menu |
+| `M07_VistaPaint.kt` | Custom View that manages drawing |
+| `M07_PathDit.kt` | Data class representing an individual stroke |
+| `res/menu/m07_menu.xml` | Menu: Emboss / Blur / Clear |
 
-## 🔑 Conceptes clau
+## Key Concepts
 
-### Path – Corbes de Bézier quadràtiques
-`Path` permet definir trajectòries complexes. En lloc de línies rectes, s'usen corbes quadràtiques per a traços suaus:
+### Path – Quadratic Bezier Curves
+`Path` allows defining complex trajectories. Instead of straight lines, quadratic curves are used for smooth strokes:
 
 ```kotlin
-// Iniciar un nou traç
+// Start a new stroke
 rutaActual = Path()
-rutaActual.moveTo(x, y)          // Punt inicial
+rutaActual.moveTo(x, y)          // Starting point
 
-// En moure el dit, afegir corba
+// While moving the finger, add a curve
 rutaActual.quadTo(
-    xAnterior, yAnterior,         // Punt de control
-    (x + xAnterior) / 2,          // Punt final (punt mig)
-    (y + yAnterior) / 2
+    xPrev, yPrev,                 // Control point
+    (x + xPrev) / 2,              // End point (midpoint)
+    (y + yPrev) / 2
 )
 
-// En aixecar el dit
-rutaActual.lineTo(xAnterior, yAnterior)
+// When the finger is lifted
+rutaActual.lineTo(xPrev, yPrev)
 ```
 
-### Gestió d'events tàctils
+### Touch Event Handling
 
 ```kotlin
 override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -41,99 +41,98 @@ override fun onTouchEvent(event: MotionEvent): Boolean {
     when (event.action) {
         MotionEvent.ACTION_DOWN -> { touchStart(x, y); invalidate() }
         MotionEvent.ACTION_MOVE -> { touchMove(x, y); invalidate() }
-        MotionEvent.ACTION_UP   -> { touchUp();       invalidate() }
+        MotionEvent.ACTION_UP   -> { touchUp(); invalidate(); performClick() }
     }
-    return true  // Indica que hem gestionat l'event
+    return true  // Indicates that we handled the event
 }
 ```
 
 ### Data class M07_PathDit
-Cada traç és un objecte immutable amb tota la informació necessària per dibuixar-lo:
+Each stroke is an immutable object containing all the information needed to draw it:
 
 ```kotlin
 data class M07_PathDit(
     val color: Int,
-    val relleu: Boolean,
-    val difumina: Boolean,
-    val ampladaTrac: Int,
-    val ruta: Path
+    val emboss: Boolean,
+    val blur: Boolean,
+    val strokeWidth: Int,
+    val path: Path
 )
 ```
 
-### MaskFilter – Efectes visuals
-Els filtres s'apliquen al `Paint` per modificar l'aparença del traç:
+### MaskFilter – Visual Effects
+Filters are applied to the `Paint` to modify the appearance of the stroke:
 
-**Relleu (EmbossMaskFilter):**
+**Emboss (EmbossMaskFilter):**
 ```kotlin
-val filtroRelleu: MaskFilter = EmbossMaskFilter(
-    floatArrayOf(1f, 1f, 1f),  // Direcció de la llum (x, y, z)
-    0.4f,                       // Llum ambient
-    6f,                         // Especularitat
-    3.5f                        // Suavitat del relleu
+val embossFilter: MaskFilter = EmbossMaskFilter(
+    floatArrayOf(1f, 1f, 1f),  // Light direction (x, y, z)
+    0.4f,                       // Ambient light
+    6f,                         // Specular
+    3.5f                        // Emboss smoothness
 )
-paint.maskFilter = filtroRelleu
+paint.maskFilter = embossFilter
 ```
 
-**Difuminat (BlurMaskFilter):**
+**Blur (BlurMaskFilter):**
 ```kotlin
-val filtroDifumina: MaskFilter = BlurMaskFilter(
-    5f,                         // Radi del difuminat
-    BlurMaskFilter.Blur.NORMAL  // Tipus: NORMAL, SOLID, INNER, OUTER
+val blurFilter: MaskFilter = BlurMaskFilter(
+    5f,                         // Blur radius
+    BlurMaskFilter.Blur.NORMAL  // Type: NORMAL, SOLID, INNER, OUTER
 )
-paint.maskFilter = filtroDifumina
+paint.maskFilter = blurFilter
 ```
 
-### Patró de doble buffer (Bitmap off-screen)
-Per evitar parpelleig, es dibuixa sobre un Bitmap auxiliar i després es copia al Canvas principal:
+### Double Buffer Pattern (Off-screen Bitmap)
+To avoid flickering, drawing is done onto an auxiliary Bitmap and then copied to the main Canvas:
 
 ```kotlin
 override fun onDraw(canvas: Canvas) {
     canvas.save()
-    canvasBitmap?.drawColor(colorFons)           // Esborrar fons
+    canvasBitmap?.drawColor(backgroundColour)       // Clear background
 
-    for (fp in tracos) {
-        pintura.color       = fp.color
-        pintura.strokeWidth = fp.ampladaTrac.toFloat()
-        pintura.maskFilter  = if (fp.relleu) filtroRelleu
-                              else if (fp.difumina) filtroDifumina
-                              else null
-        canvasBitmap?.drawPath(fp.ruta, pintura) // Dibuixar al buffer
+    for (fp in strokes) {
+        paint.color       = fp.color
+        paint.strokeWidth = fp.strokeWidth.toFloat()
+        paint.maskFilter  = if (fp.emboss) embossFilter
+                            else if (fp.blur) blurFilter
+                            else null
+        canvasBitmap?.drawPath(fp.path, paint)      // Draw to buffer
     }
-    bitmap?.let { canvas.drawBitmap(it, 0f, 0f, pinturaBitmap) } // Copiar al Canvas
+    bitmap?.let { canvas.drawBitmap(it, 0f, 0f, bitmapPaint) } // Copy to Canvas
     canvas.restore()
 }
 ```
 
-### Tolerància del tàctil
-Per evitar traços massa zigzagants amb petits tremolors del dit:
+### Touch Tolerance
+To avoid overly jagged strokes from slight finger tremors:
 
 ```kotlin
-private const val TOLERANCIA_TACTE = 4f
+private const val TOUCH_TOLERANCE = 4f
 
 private fun touchMove(x: Float, y: Float) {
-    val dx = Math.abs(x - xAnterior)
-    val dy = Math.abs(y - yAnterior)
-    if (dx >= TOLERANCIA_TACTE || dy >= TOLERANCIA_TACTE) {
-        // Afegir punt al path
+    val dx = Math.abs(x - xPrev)
+    val dy = Math.abs(y - yPrev)
+    if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+        // Add point to the path
     }
 }
 ```
 
-## 📋 Resum del flux de dibuix
+## Drawing Flow Summary
 
 ```
-Usuari posa el dit (ACTION_DOWN)
-    → touchStart() → nou Path → nou M07_PathDit afegit a la llista
+User places finger (ACTION_DOWN)
+    -> touchStart() -> new Path -> new M07_PathDit added to the list
 
-Usuari mou el dit (ACTION_MOVE)
-    → touchMove() → quadTo() al Path actual → invalidate()
+User moves finger (ACTION_MOVE)
+    -> touchMove() -> quadTo() on the current Path -> invalidate()
 
-Usuari aixeca el dit (ACTION_UP)
-    → touchUp() → lineTo() per tancar el traç → invalidate()
+User lifts finger (ACTION_UP)
+    -> touchUp() -> lineTo() to close the stroke -> invalidate()
 
-onDraw() → recorre tota la llista de traços → dibuixa tot al Bitmap → copia al Canvas
+onDraw() -> iterates through all strokes -> draws all to Bitmap -> copies to Canvas
 ```
 
 ---
-[← M06](M06-Canvas-Personalitzat) | [Inici](Home) | [M08 →](M08-Alarmes)
-
+[M06](M06-Canvas-Personalitzat) | [Home](Home) | [M08](M08-Alarmes)

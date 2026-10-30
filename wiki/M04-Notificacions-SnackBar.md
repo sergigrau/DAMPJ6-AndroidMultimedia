@@ -1,53 +1,53 @@
-# M04 – Notificacions i SnackBar
+# M04 – Notifications and SnackBar
 
-## 🎯 Objectiu
-Aprendre a mostrar missatges informatius a l'usuari amb `Snackbar` (notificació no intrusiva a la part inferior de la pantalla) i `Toast`, i entendre quan és adequat usar cadascun.
+## Objective
+Learn how to show informational messages to the user with `Snackbar` (a non-intrusive notification at the bottom of the screen) and `Toast`, and understand when each one is appropriate.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M04_Notificacions_SnackBar.kt` | Activity principal |
-| `res/layout/m04_notificacions_snack_bar.xml` | Layout amb CoordinatorLayout i FAB |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M04_Notificacions_SnackBar.kt` | Main activity |
+| `res/layout/m04_notificacions_snack_bar.xml` | Layout with CoordinatorLayout and FAB |
 
-## 🔑 Conceptes clau
+## Key Concepts
 
 ### Snackbar
-El `Snackbar` és un component de Material Design que apareix a la part inferior de la pantalla durant un temps limitat. A diferència del `Toast`, pot incloure una **acció interactiva**:
+`Snackbar` is a Material Design component that appears at the bottom of the screen for a limited time. Unlike `Toast`, it can include an **interactive action**:
 
 ```kotlin
-Snackbar.make(view, "Reproduïnt...", Snackbar.LENGTH_LONG)
-    .setAction("Veure") {
-        Toast.makeText(applicationContext, "Acció veure més", Toast.LENGTH_LONG).show()
+Snackbar.make(view, "Playing...", Snackbar.LENGTH_LONG)
+    .setAction("View") {
+        Toast.makeText(applicationContext, "View more action", Toast.LENGTH_LONG).show()
     }
     .show()
 ```
 
-**Durades disponibles:**
-| Constant | Durada |
-|----------|--------|
-| `LENGTH_SHORT` | ~2 segons |
-| `LENGTH_LONG` | ~3.5 segons |
-| `LENGTH_INDEFINITE` | Fins que l'usuari o el codi la tanquen |
+**Available durations:**
+| Constant | Duration |
+|----------|----------|
+| `LENGTH_SHORT` | ~2 seconds |
+| `LENGTH_LONG` | ~3.5 seconds |
+| `LENGTH_INDEFINITE` | Until dismissed by user or code |
 
 ### Toast
-Missatge emergent simple, sense interacció possible:
+A simple pop-up message with no interaction:
 
 ```kotlin
-Toast.makeText(context, "Text del missatge", Toast.LENGTH_SHORT).show()
+Toast.makeText(context, "Message text", Toast.LENGTH_SHORT).show()
 ```
 
-### Comparativa Snackbar vs Toast
-| Característica | Snackbar | Toast |
-|----------------|----------|-------|
-| Posició | Part inferior (sobre la UI) | Centre/baix |
-| Acció | ✅ Sí | ❌ No |
-| Es pot descartar | ✅ Lliscant | ❌ No |
-| Context necessari | View | Context |
-| Material Design | ✅ | ❌ |
-| Recomanat per | Missatges d'acció | Missatges simples |
+### Snackbar vs Toast Comparison
+| Feature | Snackbar | Toast |
+|---------|----------|-------|
+| Position | Bottom (over UI) | Centre/bottom |
+| Action | Yes | No |
+| Dismissable | Yes (swipe) | No |
+| Context needed | View | Context |
+| Material Design | Yes | No |
+| Recommended for | Action feedback | Simple messages |
 
 ### CoordinatorLayout
-Per a que el `Snackbar` es mostri correctament i que el FAB pugui pujar quan apareix, cal que el layout arrel sigui un `CoordinatorLayout`:
+For the `Snackbar` to display correctly and the FAB to slide up when it appears, the root layout must be a `CoordinatorLayout`:
 
 ```xml
 <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -62,21 +62,20 @@ Per a que el `Snackbar` es mostri correctament i que el FAB pugui pujar quan apa
 ```
 
 ### FloatingActionButton (FAB)
-Botó circular flotant que fa una acció principal:
+A circular floating button that triggers a primary action:
 
 ```kotlin
 val fab: FloatingActionButton = findViewById(R.id.fab)
 fab.setOnClickListener { view ->
-    Snackbar.make(view, "Missatge", Snackbar.LENGTH_LONG).show()
+    Snackbar.make(view, "Message", Snackbar.LENGTH_LONG).show()
 }
 ```
 
-## 📌 Quan usar cada element
-- **Snackbar:** Confirmació d'una acció (fitxer desat, email enviat, element eliminat amb opció de desfer).
-- **Toast:** Missatges informatius ràpids sense resposta de l'usuari.
-- **Dialog/AlertDialog:** Quan cal confirmació explícita de l'usuari.
-- **Notification:** Per notificacions que han de persistir fora de l'app.
+## When to Use Each Element
+- **Snackbar:** Action confirmation (file saved, email sent, item deleted with undo option).
+- **Toast:** Quick informational messages that require no user response.
+- **Dialog/AlertDialog:** When explicit user confirmation is required.
+- **Notification:** For notifications that must persist outside the app.
 
 ---
-[← M03](M03-ExecutorService) | [Inici](Home) | [M05 →](M05-Canvas-Basic)
-
+[M03](M03-ExecutorService) | [Home](Home) | [M05](M05-Canvas-Basic)

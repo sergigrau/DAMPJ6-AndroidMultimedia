@@ -1,116 +1,115 @@
-# M10 – Animació bàsica amb ObjectAnimator
+# M10 – Basic Animation with ObjectAnimator
 
-## 🎯 Objectiu
-Aprendre a animar propietats de vistes (`x`, `y`, `alpha`, `scaleX`, `rotation`...) amb `ObjectAnimator`, el mecanisme d'animació de propietats d'Android (Property Animation System).
+## Objective
+Learn how to animate view properties (`x`, `y`, `alpha`, `scaleX`, `rotation`...) with `ObjectAnimator`, the core of Android's Property Animation System.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M10_AnimacioBasica.kt` | Activity principal |
-| `res/layout/m10_animacio_basica.xml` | Layout amb Toolbar i FAB |
-
----
-
-# M11 – Animació seqüencial amb AnimatorSet
-
-## 🎯 Objectiu
-Combinar múltiples `ObjectAnimator` en seqüència o en paral·lel amb `AnimatorSet`, i crear animacions cícliques que es repeteixen indefinidament.
-
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M11_AnimacioRequadre.kt` | Activity principal |
-| `res/layout/m11_animacio_requadre.xml` | Layout amb un Button |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M10_AnimacioBasica.kt` | Main activity |
+| `res/layout/m10_animacio_basica.xml` | Layout with Toolbar and FAB |
 
 ---
 
-## 🔑 Conceptes clau comuns
+# M11 – Sequential Animation with AnimatorSet
 
-### ObjectAnimator – Animació d'una propietat
-`ObjectAnimator` anima una propietat específica d'un objecte de `valor_inici` a `valor_final`:
+## Objective
+Combine multiple `ObjectAnimator` instances in sequence or in parallel using `AnimatorSet`, and create cyclic animations that repeat indefinitely.
+
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M11_AnimacioRequadre.kt` | Main activity |
+| `res/layout/m11_animacio_requadre.xml` | Layout with a Button |
+
+---
+
+## Key Concepts (M10 and M11)
+
+### ObjectAnimator – Single Property Animation
+`ObjectAnimator` animates a specific property of an object from a start value to an end value:
 
 ```kotlin
-// Mou el FAB verticalment fins a la meitat de la pantalla
-val anim = ObjectAnimator.ofFloat(fab, "y", 0f, alcada / 2f)
+// Move the FAB vertically to the middle of the screen
+val anim = ObjectAnimator.ofFloat(fab, "y", 0f, height / 2f)
 anim.duration = 1000  // ms
 anim.start()
 
-// Desvaneix el FAB
+// Fade the FAB out
 val animAlpha = ObjectAnimator.ofFloat(fab, "alpha", 1f, 0f)
 animAlpha.duration = 1000
 animAlpha.start()
 ```
 
-### Propietats animables
-| Propietat (String) | Descripció |
-|--------------------|-----------|
-| `"x"`, `"y"` | Posició absoluta |
-| `"translationX"`, `"translationY"` | Desplaçament relatiu |
-| `"alpha"` | Transparència (0.0 = transparent, 1.0 = opac) |
-| `"scaleX"`, `"scaleY"` | Escala horitzontal / vertical |
-| `"rotation"` | Rotació en graus |
-| `"rotationX"`, `"rotationY"` | Rotació en 3D |
+### Animatable Properties
+| Property (String) | Description |
+|-------------------|-------------|
+| `"x"`, `"y"` | Absolute position |
+| `"translationX"`, `"translationY"` | Relative displacement |
+| `"alpha"` | Transparency (0.0 = transparent, 1.0 = opaque) |
+| `"scaleX"`, `"scaleY"` | Horizontal / vertical scale |
+| `"rotation"` | Rotation in degrees |
+| `"rotationX"`, `"rotationY"` | 3D rotation |
 
-### AnimatorSet – Combinació d'animadors
+### AnimatorSet – Combining Animators
 
 ```kotlin
-val animacio1 = ObjectAnimator.ofFloat(boto, "x", 0f, (amplada - boto.width).toFloat()).apply { duration = 1000 }
-val animacio2 = ObjectAnimator.ofFloat(boto, "y", 0f, (alcada - boto.height).toFloat()).apply { duration = 1000 }
-val animacio3 = ObjectAnimator.ofFloat(boto, "x", (amplada - boto.width).toFloat(), 0f).apply { duration = 1000 }
-val animacio4 = ObjectAnimator.ofFloat(boto, "y", (alcada - boto.height).toFloat(), 0f).apply { duration = 1000 }
+val anim1 = ObjectAnimator.ofFloat(button, "x", 0f, (width - button.width).toFloat()).apply { duration = 1000 }
+val anim2 = ObjectAnimator.ofFloat(button, "y", 0f, (height - button.height).toFloat()).apply { duration = 1000 }
+val anim3 = ObjectAnimator.ofFloat(button, "x", (width - button.width).toFloat(), 0f).apply { duration = 1000 }
+val anim4 = ObjectAnimator.ofFloat(button, "y", (height - button.height).toFloat(), 0f).apply { duration = 1000 }
 
-val animacio = AnimatorSet()
-animacio.playSequentially(animacio1, animacio2, animacio3, animacio4)
-animacio.start()
+val animSet = AnimatorSet()
+animSet.playSequentially(anim1, anim2, anim3, anim4)
+animSet.start()
 ```
 
-**Modes de combinació:**
-| Mètode | Comportament |
-|--------|-------------|
-| `playSequentially(a1, a2, a3)` | Una darrere l'altra |
-| `playTogether(a1, a2, a3)` | Totes alhora |
-| `play(a1).before(a2)` | a1 primer, a2 després |
-| `play(a1).after(a2)` | a2 primer, a1 després |
-| `play(a1).with(a2)` | Les dues alhora |
+**Combination modes:**
+| Method | Behaviour |
+|--------|-----------|
+| `playSequentially(a1, a2, a3)` | One after another |
+| `playTogether(a1, a2, a3)` | All at the same time |
+| `play(a1).before(a2)` | a1 first, then a2 |
+| `play(a1).after(a2)` | a2 first, then a1 |
+| `play(a1).with(a2)` | Both at the same time |
 
-### Animació en bucle amb AnimatorListenerAdapter
+### Infinite Loop with AnimatorListenerAdapter
 
 ```kotlin
-animacio.addListener(object : AnimatorListenerAdapter() {
+animSet.addListener(object : AnimatorListenerAdapter() {
     override fun onAnimationEnd(a: Animator) {
         super.onAnimationEnd(a)
-        animacio.start()  // Reinicia en acabar → bucle infinit
+        animSet.start()  // Restart when finished -> infinite loop
     }
 })
 ```
 
-### WindowMetrics (API 30+) per obtenir dimensions de pantalla
+### WindowMetrics (API 30+) to Get Screen Dimensions
 
 ```kotlin
 val metrics: WindowMetrics = windowManager.currentWindowMetrics
 val bounds: Rect = metrics.bounds
-val alcada = bounds.height()
-val amplada = bounds.width()
+val height = bounds.height()
+val width  = bounds.width()
 ```
 
-### Interpolators – Velocitat de l'animació
-`ObjectAnimator` admet `interpolators` per controlar el ritme:
+### Interpolators – Animation Speed
+`ObjectAnimator` accepts `interpolators` to control the pace:
 
 ```kotlin
-anim.interpolator = AccelerateDecelerateInterpolator() // Per defecte
-anim.interpolator = BounceInterpolator()               // Efecte rebot
-anim.interpolator = OvershootInterpolator()            // Passa del punt final
-anim.interpolator = LinearInterpolator()               // Velocitat constant
+anim.interpolator = AccelerateDecelerateInterpolator() // Default
+anim.interpolator = BounceInterpolator()               // Bounce effect
+anim.interpolator = OvershootInterpolator()            // Overshoots end point
+anim.interpolator = LinearInterpolator()               // Constant speed
 ```
 
-## 📋 Comparativa M10 vs M11
+## M10 vs M11 Comparison
 | | M10 | M11 |
 |---|---|---|
-| Animadors | 1 per propietat | 4 combinats |
-| Combinació | Independent | `AnimatorSet.playSequentially` |
-| Bucle | No | Sí (listener) |
-| Efectes | Translació + Alpha | Translació rectangular |
+| Animators | 1 per property | 4 combined |
+| Combination | Independent | `AnimatorSet.playSequentially` |
+| Loop | No | Yes (listener) |
+| Effects | Translation + Alpha | Rectangular translation |
 
 ---
-[← M09](M09-Propietats-Dinamiques) | [Inici](Home) | [M12 →](M12-Camera-Intent)
-
+[M09](M09-Propietats-Dinamiques) | [Home](Home) | [M12](M12-Camera-Intent)

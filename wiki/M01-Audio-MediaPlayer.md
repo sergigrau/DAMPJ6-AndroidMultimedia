@@ -1,38 +1,38 @@
-# M01 – Reproducció d'àudio amb MediaPlayer
+# M01 – Audio Playback with MediaPlayer
 
-## 🎯 Objectiu
-Aprendre a reproduir un fitxer d'àudio des d'una Activity utilitzant `MediaPlayer` i gestionar el focus d'àudio del sistema per coexistir correctament amb altres aplicacions que fan servir l'àudio.
+## Objective
+Learn how to play an audio file from an Activity using `MediaPlayer` and manage the system audio focus to coexist correctly with other applications that use audio.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M01_AudioActivity.kt` | Activity principal amb controls de reproducció |
-| `res/raw/m02_audio1` | Fitxer d'àudio a reproduir |
-| `res/layout/m01_audio_principal.xml` | Layout amb ToolBar, SeekBar i FloatingActionButton |
-| `res/menu/m01_menu.xml` | Menú d'opcions |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M01_AudioActivity.kt` | Main activity with playback controls |
+| `res/raw/m02_audio1` | Audio file to play |
+| `res/layout/m01_audio_principal.xml` | Layout with Toolbar, SeekBar and FloatingActionButton |
+| `res/menu/m01_menu.xml` | Options menu |
 
-## 🔑 Conceptes clau
+## Key Concepts
 
 ### MediaPlayer
-`MediaPlayer` és la classe principal d'Android per reproduir àudio i vídeo. En aquest exercici es crea a partir d'un recurs `raw`:
+`MediaPlayer` is the main Android class for playing audio and video. In this exercise it is created from a `raw` resource:
 
 ```kotlin
 mp = MediaPlayer.create(this, R.raw.m02_audio1)
 ```
 
-**Mètodes principals:**
-| Mètode | Descripció |
-|--------|-----------|
-| `start()` | Inicia o reprèn la reproducció |
-| `pause()` | Pausa la reproducció |
-| `stop()` | Atura la reproducció |
-| `release()` | Allibera els recursos del sistema |
-| `seekTo(ms)` | Salta a la posició indicada (en ms) |
-| `isPlaying` | Retorna `true` si s'està reproduint |
-| `duration` | Durada total en ms |
+**Main methods:**
+| Method | Description |
+|--------|-------------|
+| `start()` | Starts or resumes playback |
+| `pause()` | Pauses playback |
+| `stop()` | Stops playback |
+| `release()` | Releases system resources |
+| `seekTo(ms)` | Jumps to the given position (in ms) |
+| `isPlaying` | Returns `true` if currently playing |
+| `duration` | Total duration in ms |
 
 ### AudioFocus
-La gestió del focus d'àudio és necessària per respectar el comportament del sistema quan altres apps volen usar l'àudio (p.ex., trucada entrant):
+Audio focus management is necessary to respect system behaviour when other apps want to use audio (e.g. an incoming call):
 
 ```kotlin
 val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
@@ -43,16 +43,16 @@ val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_T
 val result = am.requestAudioFocus(audioFocusRequest)
 ```
 
-**Esdeveniments de focus:**
-| Constant | Acció recomanada |
-|----------|-----------------|
-| `AUDIOFOCUS_GAIN` | Reprendre reproducció a volum normal |
-| `AUDIOFOCUS_LOSS` | Aturar i alliberar el MediaPlayer |
-| `AUDIOFOCUS_LOSS_TRANSIENT` | Pausar temporalment |
-| `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK` | Baixar el volum (`setVolume(0.5f, 0.5f)`) |
+**Focus events:**
+| Constant | Recommended action |
+|----------|--------------------|
+| `AUDIOFOCUS_GAIN` | Resume playback at normal volume |
+| `AUDIOFOCUS_LOSS` | Stop and release the MediaPlayer |
+| `AUDIOFOCUS_LOSS_TRANSIENT` | Pause temporarily |
+| `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK` | Lower volume (`setVolume(0.5f, 0.5f)`) |
 
 ### SeekBar
-Permet a l'usuari saltar a qualsevol punt de la cançó:
+Allows the user to jump to any point in the track:
 
 ```kotlin
 barraProgress.max = mp!!.duration
@@ -64,30 +64,29 @@ barraProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListene
 })
 ```
 
-## 🔄 Diagrama de flux
+## Flow Diagram
 
 ```
 onCreate()
-    │
-    ├─► Crear MediaPlayer (R.raw.m02_audio1)
-    ├─► Sol·licitar AudioFocus
-    │       │
-    │       ├─► GRANTED → mp.start()
-    │       └─► FAILED  → mp.stop()
-    │
-    └─► FAB click
-            ├─► isPlaying → pause()
-            └─► !isPlaying → start()
+    |
+    +-- Create MediaPlayer (R.raw.m02_audio1)
+    +-- Request AudioFocus
+    |       |
+    |       +-- GRANTED -> mp.start()
+    |       +-- FAILED  -> mp.stop()
+    |
+    +-- FAB click
+            +-- isPlaying -> pause()
+            +-- !isPlaying -> start()
 ```
 
-## ⚠️ Permisos necessaris
-Cap permís addicional. El fitxer d'àudio és un recurs intern de l'aplicació (`res/raw/`).
+## Required Permissions
+None. The audio file is an internal application resource (`res/raw/`).
 
-## 📌 Notes importants
-- Cal alliberar el `MediaPlayer` quan no s'usa (`release()`) per evitar fuites de memòria.
-- `MediaPlayer.create()` ja prepara el reproductor automàticament (crida `prepare()` internament).
-- `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK` indica que l'àudio pot conviure amb altres sons a volum reduït.
+## Important Notes
+- Always release the `MediaPlayer` when not in use (`release()`) to avoid memory leaks.
+- `MediaPlayer.create()` prepares the player automatically (calls `prepare()` internally).
+- `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK` means the audio can coexist with other sounds at reduced volume.
 
 ---
-[← Inici](Home) | [M02 →](M02-Audio-Service)
-
+[Home](Home) | [M02](M02-Audio-Service)

@@ -1,31 +1,31 @@
 # M15 – OpenGL ES 2.0
 
-## 🎯 Objectiu
-Introduir la programació gràfica 3D en Android amb **OpenGL ES 2.0**, aprenent a configurar un `GLSurfaceView`, crear un `Renderer`, i dibuixar formes geomètriques (triangle i quadrat) amb **shaders** GLSL. Inclou rotació interactiva per tàctil.
+## Objective
+Introduce 3D graphics programming on Android with **OpenGL ES 2.0**, learning how to configure a `GLSurfaceView`, create a `Renderer`, and draw geometric shapes (triangle and square) with **GLSL shaders**. Includes interactive rotation via touch.
 
-## 📄 Fitxers implicats
-| Fitxer | Descripció |
-|--------|-----------|
-| `M15_OpenGLES20Activity.kt` | Activity principal |
-| `M15_OpenGLES20GLSurfaceView.kt` | Vista OpenGL amb events tàctils |
-| `M15_OpenGLES20Renderer.kt` | Renderitzador (lògica de dibuix) |
-| `M15_OpenGLES20Triangle.kt` | Geometria del triangle |
-| `M15_OpenGLES20Quadrat.kt` | Geometria del quadrat |
+## Files Involved
+| File | Description |
+|------|-------------|
+| `M15_OpenGLES20Activity.kt` | Main activity |
+| `M15_OpenGLES20GLSurfaceView.kt` | OpenGL view with touch events |
+| `M15_OpenGLES20Renderer.kt` | Renderer (drawing logic) |
+| `M15_OpenGLES20Triangle.kt` | Triangle geometry |
+| `M15_OpenGLES20Quadrat.kt` | Square geometry |
 
-## 🔑 Arquitectura OpenGL ES a Android
+## OpenGL ES Architecture in Android
 
 ```
 Activity
-    └─► GLSurfaceView  (contenidor de la vista OpenGL)
-            └─► Renderer  (bucle de renderitzat en fil separat)
-                    ├─► onSurfaceCreated()   → inicialitzar shaders, formes
-                    ├─► onSurfaceChanged()   → ajustar viewport i projecció
-                    └─► onDrawFrame()        → dibuixar cada fotograma
+    +-- GLSurfaceView  (OpenGL view container)
+            +-- Renderer  (render loop on a separate thread)
+                    +-- onSurfaceCreated()   -> initialise shaders, shapes
+                    +-- onSurfaceChanged()   -> adjust viewport and projection
+                    +-- onDrawFrame()        -> draw each frame
 ```
 
-## 🔑 Conceptes clau
+## Key Concepts
 
-### GLSurfaceView – Configuració
+### GLSurfaceView – Setup
 ```kotlin
 class M15_OpenGLES20GLSurfaceView(context: Context) : GLSurfaceView(context) {
     private val renderer: M15_OpenGLES20Renderer
@@ -34,89 +34,89 @@ class M15_OpenGLES20GLSurfaceView(context: Context) : GLSurfaceView(context) {
         setEGLContextClientVersion(2)       // OpenGL ES 2.0
         renderer = M15_OpenGLES20Renderer()
         setRenderer(renderer)
-        renderMode = RENDERMODE_WHEN_DIRTY  // Renderitza només quan cal
+        renderMode = RENDERMODE_WHEN_DIRTY  // Only render when needed
     }
 }
 ```
 
-**Modes de renderitzat:**
-| Mode | Descripció |
-|------|-----------|
-| `RENDERMODE_CONTINUOUSLY` | Renderitza ~60 fps (per animacions) |
-| `RENDERMODE_WHEN_DIRTY` | Renderitza quan es crida `requestRender()` |
+**Render modes:**
+| Mode | Description |
+|------|-------------|
+| `RENDERMODE_CONTINUOUSLY` | Renders ~60 fps (for animations) |
+| `RENDERMODE_WHEN_DIRTY` | Renders only when `requestRender()` is called |
 
-### Shaders GLSL
-Els **shaders** són programes que s'executen a la GPU. N'hi ha dos tipus:
+### GLSL Shaders
+**Shaders** are programs that run on the GPU. There are two types:
 
-**Vertex Shader** – Calcula la posició de cada vèrtex:
+**Vertex Shader** – Computes the position of each vertex:
 ```glsl
-uniform mat4 uMVPMatrix;     // Matriu de transformació
-attribute vec4 vPosition;    // Posició del vèrtex d'entrada
+uniform mat4 uMVPMatrix;     // Transformation matrix
+attribute vec4 vPosition;    // Input vertex position
 void main() {
-    gl_Position = uMVPMatrix * vPosition;  // Posició final
+    gl_Position = uMVPMatrix * vPosition;  // Final position
 }
 ```
 
-**Fragment Shader** – Calcula el color de cada píxel:
+**Fragment Shader** – Computes the colour of each pixel:
 ```glsl
 precision mediump float;
-uniform vec4 vColor;         // Color uniform
+uniform vec4 vColor;         // Uniform colour
 void main() {
-    gl_FragColor = vColor;   // Color de sortida
+    gl_FragColor = vColor;   // Output colour
 }
 ```
 
-### Pipeline de renderitzat
+### Rendering Pipeline
 
 ```kotlin
-// 1. Compilar shaders
+// 1. Compile shaders
 val vertexShader   = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER)
 GLES20.glShaderSource(vertexShader, vertexShaderCode)
 GLES20.glCompileShader(vertexShader)
 
-// 2. Crear programa i enllaçar shaders
-val programa = GLES20.glCreateProgram()
-GLES20.glAttachShader(programa, vertexShader)
-GLES20.glAttachShader(programa, fragmentShader)
-GLES20.glLinkProgram(programa)
+// 2. Create program and link shaders
+val program = GLES20.glCreateProgram()
+GLES20.glAttachShader(program, vertexShader)
+GLES20.glAttachShader(program, fragmentShader)
+GLES20.glLinkProgram(program)
 
-// 3. Usar el programa i dibuixar
-GLES20.glUseProgram(programa)
-GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)     // Triangle
-GLES20.glDrawElements(GLES20.GL_TRIANGLES, count, GLES20.GL_UNSIGNED_SHORT, buffer)  // Quadrat
+// 3. Use the program and draw
+GLES20.glUseProgram(program)
+GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)           // Triangle
+GLES20.glDrawElements(GLES20.GL_TRIANGLES, count, GLES20.GL_UNSIGNED_SHORT, buffer)  // Square
 ```
 
-### Matrius de transformació MVP
-La matriu **MVP** (Model-View-Projection) transforma les coordenades 3D en coordenades de pantalla:
+### MVP Transformation Matrices
+The **MVP** matrix (Model-View-Projection) transforms 3D coordinates into screen coordinates:
 
 ```kotlin
-// Matriu Vista: posició de la càmera
-Matrix.setLookAtM(mMatriuVista, 0,
-    0f, 0f, -3f,  // Eye (posició càmera)
-    0f, 0f, 0f,   // Center (punt que mira)
-    0f, 1f, 0f    // Up (vector amunt)
+// View matrix: camera position
+Matrix.setLookAtM(viewMatrix, 0,
+    0f, 0f, -3f,  // Eye (camera position)
+    0f, 0f, 0f,   // Center (look-at point)
+    0f, 1f, 0f    // Up vector
 )
 
-// Matriu Projecció: perspectiva
-Matrix.frustumM(mMatriuProjeccio, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+// Projection matrix: perspective
+Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
 
-// Combinació: MVP = Projecció × Vista
-Matrix.multiplyMM(mMVPMatrix, 0, mMatriuProjeccio, 0, mMatriuVista, 0)
+// Combine: MVP = Projection x View
+Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
 
-// Rotació
-Matrix.setRotateM(mMatriuRotacio, 0, angle, 0f, 0f, 1f)
-Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mMatriuRotacio, 0)
+// Rotation
+Matrix.setRotateM(rotationMatrix, 0, angle, 0f, 0f, 1f)
+Matrix.multiplyMM(scratch, 0, mvpMatrix, 0, rotationMatrix, 0)
 ```
 
-### Buffers de vèrtexs (FloatBuffer)
-Les coordenades dels vèrtexs s'han d'emmagatzemar en buffers natius:
+### Vertex Buffers (FloatBuffer)
+Vertex coordinates must be stored in native buffers:
 
 ```kotlin
-// Triangle (3 vèrtexs × 3 coordenades)
+// Triangle (3 vertices x 3 coordinates)
 val triangleCoords = floatArrayOf(
-     0.0f,  0.622f, 0.0f,   // cim
-    -0.5f, -0.311f, 0.0f,   // inferior esquerre
-     0.5f, -0.311f, 0.0f    // inferior dret
+     0.0f,  0.622f, 0.0f,   // top
+    -0.5f, -0.311f, 0.0f,   // bottom left
+     0.5f, -0.311f, 0.0f    // bottom right
 )
 
 val vertexBuffer: FloatBuffer = ByteBuffer
@@ -126,41 +126,40 @@ val vertexBuffer: FloatBuffer = ByteBuffer
     .apply { put(triangleCoords); position(0) }
 ```
 
-### Rotació per tàctil
+### Touch Rotation
 ```kotlin
 override fun onTouchEvent(e: MotionEvent): Boolean {
     if (e.action == MotionEvent.ACTION_MOVE) {
-        var dx = e.x - previaX
-        var dy = e.y - previaY
+        var dx = e.x - prevX
+        var dy = e.y - prevY
 
-        // Invertir direcció a la meitat de la pantalla
+        // Reverse direction at screen midpoint
         if (e.y > height / 2) dx *= -1
         if (e.x < width / 2)  dy *= -1
 
-        renderer.setAngle(renderer.getAngle() + (dx + dy) * TOUCH_ESCALA_FACTOR)
+        renderer.setAngle(renderer.getAngle() + (dx + dy) * TOUCH_SCALE_FACTOR)
         requestRender()
     }
     // ...
 }
 ```
 
-## 📐 Sistema de coordenades OpenGL
+## OpenGL Coordinate System
 ```
        +Y
-        │
-   -X ──┼── +X
-        │
+        |
+   -X --+-- +X
+        |
        -Y
-        Z (surt cap a l'espectador)
+        Z (towards the viewer)
 ```
 
-Les coordenades de OpenGL van de **-1 a +1** en cada eix (coordenades normalitzades del dispositiu - NDC).
+Coordinates range from **-1 to +1** on each axis (Normalized Device Coordinates - NDC).
 
-## ⚠️ Consideracions de rendiment
-- Minimitzar les crides a `glDraw*()` per fotograma.
-- Reutilitzar shaders compilats (no recompilar cada fotograma).
-- Usar `RENDERMODE_WHEN_DIRTY` per estalviar bateria quan no hi ha animació.
+## Performance Considerations
+- Minimise `glDraw*()` calls per frame.
+- Reuse compiled shaders (do not recompile every frame).
+- Use `RENDERMODE_WHEN_DIRTY` to save battery when there is no animation.
 
 ---
-[← M14](M14-Imatge-SD) | [Inici](Home) | [M16 →](M16-Lectura-XML)
-
+[M14](M14-Imatge-SD) | [Home](Home) | [M16](M16-Lectura-XML)
