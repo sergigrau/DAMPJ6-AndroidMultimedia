@@ -5,7 +5,7 @@
 
 Col·lecció d'exercicis pràctics de desenvolupament d'aplicacions Android per al mòdul de Projecte del cicle formatiu DAM2.
 
-## 📖 Documentació completa → [Wiki del projecte](../../wiki)
+## Documentació completa → [Wiki del projecte](../../wiki)
 
 | Mòdul | Descripció | Conceptes |
 |-------|-----------|-----------|
@@ -31,7 +31,7 @@ Col·lecció d'exercicis pràctics de desenvolupament d'aplicacions Android per 
 | [M20](../../wiki/M20-Animacio-Sprite) | Sprite animation | `AnimationDrawable`, frame-by-frame |
 | [M21](../../wiki/M21-Servei-Suma) | Servei de càlcul | `Service`, `BroadcastReceiver`, `EdgeToEdge` |
 
-## 🚀 Publicar la wiki a GitHub
+## Publicar la wiki a GitHub
 
 ```bash
 ./publish-wiki.sh https://github.com/USUARI/DAMPJ6-AndroidMultimedia.git
