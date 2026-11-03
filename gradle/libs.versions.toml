@@ -1,5 +1,6 @@
 [versions]
-agp = "9.5.0" # O la versión de AGP que estés usando (ej. 8.7.3 / 8.8.0)
+agp = "8.13.2"
+kotlin = "2.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -25,4 +26,5 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database" 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
