@@ -1,35 +1,35 @@
-# M20 – Sprite Animation (Frame by Frame)
+# M20 – Animació per Sprites (fotograma a fotograma)
 
-## Objective
-Learn how to create **sprite** (frame-by-frame) animations in Android using `AnimationDrawable`: a sequence of static images displayed quickly to create the illusion of movement.
+## Objectiu
+Aprendre a crear animacions de tipus **sprite** (fotograma a fotograma) a Android utilitzant `AnimationDrawable`: una seqüència d'imatges estàtiques que es mostren ràpidament per crear la il·lusió de moviment.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M20_AnimacioSprite.kt` | Main activity |
-| `res/drawable/sprite.xml` | Sprite animation descriptor |
-| `res/drawable/sprite_*.png` | Individual animation frames |
-| `res/layout/m20_animacio_sprite.xml` | Layout with ImageView |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M20_AnimacioSprite.kt` | Activitat principal |
+| `res/drawable/sprite.xml` | Descriptor d'animació per sprites |
+| `res/drawable/sprite_*.png` | Fotogrames individuals de l'animació |
+| `res/layout/m20_animacio_sprite.xml` | Disseny amb ImageView |
 
-## Key Concepts
+## Conceptes clau
 
-### AnimationDrawable – Frame-by-Frame Animation
-`AnimationDrawable` is a special `Drawable` that contains a sequence of `Drawable` items displayed in order:
+### AnimationDrawable – Animació fotograma a fotograma
+`AnimationDrawable` és un `Drawable` especial que conté una seqüència d'elements `Drawable` mostrats en ordre:
 
 ```kotlin
 val imageView: ImageView = findViewById(R.id.spriteImatge)
 
-// 1. Set the animation resource as the background
+// 1. Assignar el recurs d'animació com a fons
 imageView.setBackgroundResource(R.drawable.sprite)
 
-// 2. Get the AnimationDrawable
+// 2. Obtenir l'AnimationDrawable
 val anim = imageView.background as AnimationDrawable
 
-// 3. Start the animation
+// 3. Iniciar l'animació
 anim.start()
 ```
 
-### Sprite XML Descriptor (`res/drawable/sprite.xml`)
+### Descriptor XML de Sprites (`res/drawable/sprite.xml`)
 
 ```xml
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android"
@@ -44,57 +44,57 @@ anim.start()
 </animation-list>
 ```
 
-**Attributes:**
-| Attribute | Description |
-|-----------|-------------|
-| `android:oneshot="false"` | Infinite loop |
-| `android:oneshot="true"` | Plays only once |
-| `android:duration` | Duration of each frame in ms |
+**Atributs:**
+| Atribut | Descripció |
+|---------|------------|
+| `android:oneshot="false"` | Bucle infinit |
+| `android:oneshot="true"` | Es reprodueix només una vegada |
+| `android:duration` | Durada de cada fotograma en ms |
 
-### AnimationDrawable Methods
-| Method | Description |
-|--------|-------------|
-| `start()` | Starts or resumes the animation |
-| `stop()` | Stops the animation at the current frame |
-| `isRunning` | `true` if currently playing |
-| `numberOfFrames` | Total number of frames |
-| `getFrame(index)` | Gets the Drawable for a given frame |
-| `getDuration(index)` | Duration of the given frame |
+### Mètodes d'AnimationDrawable
+| Mètode | Descripció |
+|--------|------------|
+| `start()` | Inicia o reprèn l'animació |
+| `stop()` | Atura l'animació al fotograma actual |
+| `isRunning` | `true` si s'està reproduint |
+| `numberOfFrames` | Nombre total de fotogrames |
+| `getFrame(index)` | Obté el Drawable per a un fotograma donat |
+| `getDuration(index)` | Durada del fotograma donat |
 
-### Touch Control
+### Control per tacte
 ```kotlin
 override fun onTouchEvent(event: MotionEvent): Boolean {
     if (event.action == MotionEvent.ACTION_DOWN) {
-        anim.stop()    // Stop the animation when the screen is touched
+        anim.stop()    // Aturar l'animació quan es toca la pantalla
         return true
     }
     return super.onTouchEvent(event)
 }
 ```
 
-### Known Issue: `start()` in `onCreate()`
-`AnimationDrawable.start()` **does not work** if called directly in `onCreate()` because the `ImageView` has not yet been drawn. The solution is to call it in `onWindowFocusChanged()` or in a `post()`:
+### Problema conegut: `start()` a `onCreate()`
+`AnimationDrawable.start()` **no funciona** si es crida directament a `onCreate()` perquè l'`ImageView` encara no s'ha dibuixat. La solució és cridar-lo a `onWindowFocusChanged()` o en un `post()`:
 
 ```kotlin
-// Recommended solution
+// Solució recomanada
 imageView.post { anim.start() }
 
-// Alternative
+// Alternativa
 override fun onWindowFocusChanged(hasFocus: Boolean) {
     super.onWindowFocusChanged(hasFocus)
     if (hasFocus) anim.start()
 }
 ```
 
-## Android Animation Comparison
+## Comparativa d'animacions a Android
 
-| Type | Class | Suitable for |
-|------|-------|--------------|
-| **Frame-by-frame** | `AnimationDrawable` | Sprites, 2D characters |
-| **Property Animation** | `ObjectAnimator` | Movement, transparency, scale |
-| **View Animation** | `AlphaAnimation`... | Simple animations (deprecated) |
-| **Transition** | `TransitionManager` | Layout changes |
-| **Lottie** | (library) | Complex vector animations |
+| Tipus | Classe | Recomanat per a |
+|-------|--------|-----------------|
+| **Fotograma a fotograma** | `AnimationDrawable` | Sprites, personatges 2D |
+| **Property Animation** | `ObjectAnimator` | Moviment, transparència, escala |
+| **View Animation** | `AlphaAnimation`... | Animacions simples (obsolet) |
+| **Transició** | `TransitionManager` | Canvis de disseny |
+| **Lottie** | (llibreria) | Animacions vectorials complexes |
 
 ---
 [M19](M19-Animacio-Descriptor) | [Home](Home) | [M21](M21-Servei-Suma)

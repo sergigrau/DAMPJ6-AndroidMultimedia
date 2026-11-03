@@ -1,57 +1,57 @@
-# M09 – Dynamic View Properties
+# M09 – Propietats de Vistes Dinàmiques
 
-## Objective
-Learn how to create and configure views (`Button`, `LinearLayout`, etc.) entirely programmatically at runtime, without relying on an XML layout. This enables building dynamic interfaces based on data or conditions.
+## Objectiu
+Aprendre a crear i configurar vistes (`Button`, `LinearLayout`, etc.) completament per codi en temps d'execució, sense dependre d'un layout XML. Això permet construir interfícies dinàmiques basades en dades o condicions.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M09_Propietats_dinamiques.kt` | Main activity |
-| `res/layout/m09_propietats_dinamiques.xml` | Base layout with a `LinearLayout` container |
+## Fitxers Involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M09_Propietats_dinamiques.kt` | Activity principal |
+| `res/layout/m09_propietats_dinamiques.xml` | Layout base amb un contenidor `LinearLayout` |
 
-## Key Concepts
+## Conceptes Clau
 
-### Programmatic View Creation
+### Creació de Vistes per Codi
 
 ```kotlin
-// Create a button dynamically
+// Crea un botó dinàmicament
 val button = Button(this)
 button.text = "Sergi Grau"
 
-// Create a LinearLayout dynamically
+// Crea un LinearLayout dinàmicament
 val ll = LinearLayout(this)
 ll.orientation = LinearLayout.VERTICAL
 ```
 
-### LayoutParams – Defining Dimensions and Margins
-`LayoutParams` defines how a view should be placed inside its parent container:
+### LayoutParams – Definició de Mides i Marges
+`LayoutParams` defineix com s'ha de col·locar una vista dins del seu contenidor pare:
 
 ```kotlin
 val lp = LinearLayout.LayoutParams(
-    LinearLayout.LayoutParams.MATCH_PARENT,  // width
-    LinearLayout.LayoutParams.WRAP_CONTENT   // height
+    LinearLayout.LayoutParams.MATCH_PARENT,  // amplada
+    LinearLayout.LayoutParams.WRAP_CONTENT   // alçada
 )
 
-// Margins in pixels (convert from dp to px)
+// Marges en píxels (convertir de dp a px)
 val margin = (16 * resources.displayMetrics.density).toInt()
 lp.setMargins(margin, margin, margin, margin)
 
 ll.layoutParams = lp
 ```
 
-### `ViewGroup.LayoutParams` Hierarchy
+### Jerarquia de `ViewGroup.LayoutParams`
 ```
 ViewGroup.LayoutParams
-    +-- LinearLayout.LayoutParams  (adds gravity, weight)
-    +-- RelativeLayout.LayoutParams (adds relative rules)
+    +-- LinearLayout.LayoutParams  (afegeix gravetat, pes)
+    +-- RelativeLayout.LayoutParams (afegeix regles relatives)
     +-- ConstraintLayout.LayoutParams
     +-- FrameLayout.LayoutParams
 ```
 
-> Always use the `LayoutParams` type of the **parent**, not of the child view.
+> Utilitzeu sempre el tipus de `LayoutParams` del **pare**, no de la vista fill.
 
-### dp to px Conversion
-Margins and dimensions are always specified in **dp** but Android methods expect **pixels**:
+### Conversió de dp a px
+Els marges i dimensions s'especifiquen sempre en **dp** però els mètodes d'Android esperen **píxels**:
 
 ```kotlin
 fun dpToPx(dp: Int): Int {
@@ -59,43 +59,43 @@ fun dpToPx(dp: Int): Int {
 }
 ```
 
-### Adding Views to a Layout
+### Afegir Vistes a un Layout
 
 ```kotlin
 val container: LinearLayout = findViewById(R.id.contingut)
 
-// Add the LinearLayout to the existing container
+// Afegeix el LinearLayout al contenidor existent
 container.addView(ll)
 
-// Add the button to the new LinearLayout with its own LayoutParams
+// Afegeix el botó al nou LinearLayout amb els seus propis LayoutParams
 val btnLp = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
 ll.addView(button, btnLp)
 ```
 
-### Event Handling on Dynamic Views
-Listeners can be added programmatically, just as with XML views:
+### Gestió d'Esdeveniments en Vistes Dinàmiques
+Es poden afegir listeners per codi, exactament igual que amb les vistes XML:
 
 ```kotlin
 button.setOnClickListener {
-    Toast.makeText(this, "Button clicked: Sergi Grau", Toast.LENGTH_SHORT).show()
+    Toast.makeText(this, "Botó clicat: Sergi Grau", Toast.LENGTH_SHORT).show()
 }
 ```
 
-## XML vs Programmatic Comparison
+## Comparació XML vs Codi
 
-| Aspect | XML | Programmatic |
-|--------|-----|--------------|
-| Readability | High | Medium |
-| Performance | Similar | Similar |
-| Dynamic | Static | Dynamic |
-| Refactoring | Easy | Can be complex |
-| Recommended for | Fixed layouts | Lists, builders, conditional views |
+| Aspecte | XML | Codi |
+|---------|-----|------|
+| Llegibilitat | Alta | Mitjana |
+| Rendiment | Similar | Similar |
+| Dinamisme | Estàtic | Dinàmic |
+| Refactorització | Fàcil | Pot ser complex |
+| Recomanat per | Layouts fixos | Llistes, constructors, vistes condicionals |
 
-## Practical Use Cases
-- Generating dynamic forms based on server data.
-- Creating cards (`CardView`) for each item in a list.
-- Adding/removing rows from a table in real time.
-- Creating adaptive layouts for tablets/phones.
+## Casos d'Ús Pràctics
+- Generar formularis dinàmics basats en dades del servidor.
+- Crear targetes (`CardView`) per a cada element d'una llista.
+- Afegir/eliminar files d'una taula en temps real.
+- Crear layouts adaptatius per a tauletes/mòbils.
 
 ---
 [M08](M08-Alarmes) | [Home](Home) | [M10](M10-Animacio-Basica)

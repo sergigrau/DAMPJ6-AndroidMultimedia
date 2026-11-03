@@ -1,19 +1,19 @@
-# M19 – XML Animation Descriptor
+# M19 – Descriptor d'animació XML
 
-## Objective
-Learn how to define animations in XML files (descriptors) instead of code, and load them at runtime with `AnimatorInflater`. This allows animations to be reused and maintained in a centralised way.
+## Objectiu
+Aprendre a definir animacions en fitxers XML (descriptors) en lloc de codi, i carregar-los en temps d'execució amb `AnimatorInflater`. Això permet reutilitzar i mantenir les animacions de forma centralitzada.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M19_AnimacioDescriptor.kt` | Main activity |
-| `res/animator/animacio.xml` | XML animation descriptor |
-| `res/layout/m11_animacio_requadre.xml` | Layout reused from M11 |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M19_AnimacioDescriptor.kt` | Activitat principal |
+| `res/animator/animacio.xml` | Descriptor d'animació XML |
+| `res/layout/m11_animacio_requadre.xml` | Disseny reutilitzat de M11 |
 
-## Key Concepts
+## Conceptes clau
 
-### XML Animation Descriptor
-Animations are defined in `res/animator/` (not `res/anim/` which is for the old View Animation system):
+### Descriptor d'animació XML
+Les animacions es defineixen a `res/animator/` (no a `res/anim/`, que és per al sistema antic de View Animation):
 
 ```xml
 <!-- res/animator/animacio.xml -->
@@ -35,62 +35,62 @@ Animations are defined in `res/animator/` (not `res/anim/` which is for the old 
 </set>
 ```
 
-**Main attributes:**
-| Attribute | Description |
-|-----------|-------------|
-| `propertyName` | Name of the property to animate |
-| `duration` | Duration in ms |
-| `valueFrom` | Initial value (optional) |
-| `valueTo` | Final value |
+**Atributs principals:**
+| Atribut | Descripció |
+|---------|------------|
+| `propertyName` | Nom de la propietat a animar |
+| `duration` | Durada en ms |
+| `valueFrom` | Valor inicial (opcional) |
+| `valueTo` | Valor final |
 | `valueType` | `floatType`, `intType` |
-| `startOffset` | Delay before starting |
-| `repeatCount` | Number of repetitions (-1 = infinite) |
-| `repeatMode` | `restart` or `reverse` |
+| `startOffset` | Retard abans de començar |
+| `repeatCount` | Nombre de repeticions (-1 = infinit) |
+| `repeatMode` | `restart` o `reverse` |
 
-**`<set>` ordering:**
-| Value | Description |
-|-------|-------------|
-| `sequentially` | Animations run one after another |
-| `together` | Animations run in parallel |
+**Ordre de `<set>`:**
+| Valor | Descripció |
+|-------|------------|
+| `sequentially` | Les animacions s'executen una rere l'altra |
+| `together` | Les animacions s'executen en paral·lel |
 
-### Loading and Running the Animation
+### Carregar i executar l'animació
 
 ```kotlin
 val set = AnimatorInflater.loadAnimator(this, R.animator.animacio) as AnimatorSet
-set.setTarget(button)   // The object the animation is applied to
+set.setTarget(button)   // L'objecte al qual s'aplica l'animació
 set.start()
 ```
 
-### XML vs Code Comparison
+### Comparativa entre XML i Codi
 
 ```kotlin
-// Via XML (M19)
+// Mitjançant XML (M19)
 val set = AnimatorInflater.loadAnimator(this, R.animator.animacio) as AnimatorSet
 set.setTarget(button)
 set.start()
 
-// Via code (M10/M11)
+// Mitjançant codi (M10/M11)
 val anim1 = ObjectAnimator.ofFloat(button, "x", 0f, 500f).apply { duration = 1000 }
 val anim2 = ObjectAnimator.ofFloat(button, "y", 0f, 500f).apply { duration = 1000 }
 AnimatorSet().apply { playSequentially(anim1, anim2); start() }
 ```
 
-**Advantages of each approach:**
-| | XML | Code |
+**Avantatges de cada enfocament:**
+| | XML | Codi |
 |---|---|---|
-| Reusability | High | Requires refactoring |
-| Dynamic values | Difficult | Easy |
-| Readability | Clear | Can be verbose |
-| IDE preview | Yes | No |
-| Logic conditions | No | Yes |
+| Reutilització | Alta | Requereix refactorització |
+| Valors dinàmics | Difícil | Fàcil |
+| Llegibilitat | Clara | Pot ser verbosa |
+| Vista prèvia IDE | Sí | No |
+| Condicions lògiques | No | Sí |
 
-## Difference Between `res/anim/` and `res/animator/`
-| Folder | System | Classes |
-|--------|--------|---------|
-| `res/anim/` | View Animation (old) | `AlphaAnimation`, `TranslateAnimation`... |
+## Diferència entre `res/anim/` i `res/animator/`
+| Carpeta | Sistema | Classes |
+|---------|---------|---------|
+| `res/anim/` | View Animation (antic) | `AlphaAnimation`, `TranslateAnimation`... |
 | `res/animator/` | Property Animation (modern) | `ObjectAnimator`, `AnimatorSet`... |
 
-> Always use `res/animator/` for new animations.
+> Utilitzar sempre `res/animator/` per a animacions noves.
 
 ---
 [M18](M18-Firebase) | [Home](Home) | [M20](M20-Animacio-Sprite)

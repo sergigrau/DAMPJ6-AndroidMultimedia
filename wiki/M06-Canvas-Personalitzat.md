@@ -1,35 +1,35 @@
-# M06 – Custom View with Canvas
+# M06 – Vista Personalitzada amb Canvas
 
-## Objective
-Create a custom `View` that draws with `Canvas` by overriding the `onDraw()` method, and learn how to define **custom XML attributes** to configure it from the layout.
+## Objectiu
+Crear una `View` personalitzada que dibuixi amb `Canvas` sobreescrivint el mètode `onDraw()`, i aprendre a definir **atributs XML personalitzats** per configurar-la des del layout.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M06_CanvasPersonalitzat.kt` | Activity that uses the custom view |
-| `M06_VistaPropia.kt` | Custom `View` class |
-| `res/layout/m06_canvas_personalitzat_principal.xml` | Layout with the custom view |
-| `res/values/attrs.xml` | Custom attribute definitions |
+## Fitxers Involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M06_CanvasPersonalitzat.kt` | Activity que utilitza la vista personalitzada |
+| `M06_VistaPropia.kt` | Classe `View` personalitzada |
+| `res/layout/m06_canvas_personalitzat_principal.xml` | Layout amb la vista personalitzada |
+| `res/values/attrs.xml` | Definicions d'atributs personalitzats |
 
-## Key Concepts
+## Conceptes Clau
 
-### Why a Custom View?
-Unlike M05 (static drawing onto a Bitmap), a custom `View`:
-- **Redraws automatically** when size or orientation changes.
-- Can handle **touch events**.
-- Integrates fully into Android's **layout system**.
-- Can be reused in **multiple XML layouts**.
+### Per què una Vista Personalitzada?
+A diferència de M05 (dibuix estàtic sobre un Bitmap), una vista personalitzada:
+- **Es redibuixa automàticament** quan canvia la mida o l'orientació.
+- Pot gestionar **esdeveniments tàctils**.
+- S'integra plenament en el **sistema de layouts** d'Android.
+- Es pot reutilitzar en **múltiples layouts XML**.
 
-### Structure of a Custom View
+### Estructura d'una Vista Personalitzada
 
 ```kotlin
 class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private var color: Int = 0
-    // Paint preallocated outside onDraw() to avoid allocations during drawing
+    // Paint preassignat fora de onDraw() per evitar creacions durant el dibuix
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    // 1. Read attributes from the XML layout
+    // 1. Llegeix els atributs del layout XML
     init {
         val a = context.theme.obtainStyledAttributes(
             attrs, R.styleable.M06_VistaPropia, 0, 0
@@ -38,11 +38,11 @@ class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, att
             xPos = a.getFloat(R.styleable.M06_VistaPropia_x, 0f)
             cadena = a.getString(R.styleable.M06_VistaPropia_cadena)
         } finally {
-            a.recycle()  // IMPORTANT: always recycle the TypedArray
+            a.recycle()  // IMPORTANT: reciclar sempre el TypedArray
         }
     }
 
-    // 2. Override onDraw to draw
+    // 2. Sobreescriu onDraw per dibuixar
     override fun onDraw(canvas: Canvas) {
         paint.color = color
         canvas.drawRect(xPos, yPos, 450f, 600f, paint)
@@ -51,15 +51,15 @@ class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, att
         canvas.drawText(cadena ?: "", 40f, 250f, paint)
     }
 
-    // 3. Setters that can trigger a redraw
+    // 3. Setters que poden disparar un redibuix
     fun setColor(c: Int) {
         color = c
-        invalidate()  // Forces onDraw()
+        invalidate()  // Força onDraw()
     }
 }
 ```
 
-### Defining Custom Attributes (`res/values/attrs.xml`)
+### Definició d'Atributs Personalitzats (`res/values/attrs.xml`)
 
 ```xml
 <resources>
@@ -70,7 +70,7 @@ class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, att
 </resources>
 ```
 
-### Using the View in XML Layout
+### Ús de la Vista al Layout XML
 
 ```xml
 <edu.fje.dam2.M06_VistaPropia
@@ -81,31 +81,31 @@ class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, att
     app:cadena="Android" />
 ```
 
-### Using the View from an Activity
+### Ús de la Vista des d'una Activity
 
 ```kotlin
 val vistaPropia: M06_VistaPropia = findViewById(R.id.vista)
 vistaPropia.setColor(Color.RED)
 ```
 
-### View Lifecycle
+### Cicle de Vida de la View
 ```
 Constructor -> onMeasure() -> onLayout() -> onDraw()
                                                ^
                                          invalidate()
-                                     (forces a redraw)
+                                     (força un redibuix)
 ```
 
 ### `invalidate()` vs `requestLayout()`
-| Method | When to use |
-|--------|-------------|
-| `invalidate()` | When the visual content changes (colour, text...) |
-| `requestLayout()` | When the size or position of the view changes |
+| Mètode | Quan utilitzar-lo |
+|--------|-------------------|
+| `invalidate()` | Quan el contingut visual canvia (color, text...) |
+| `requestLayout()` | Quan la mida o la posició de la vista canvien |
 
-## Best Practices in `onDraw()`
-- **Do not create objects** inside `onDraw()`: it is called many times per second. Create the `Paint` in the constructor.
-- **Do not perform expensive operations** (I/O, network) inside `onDraw()`.
-- Always call `a.recycle()` after using a `TypedArray`.
+## Bones Pràctiques a `onDraw()`
+- **No creïs objectes** dins de `onDraw()`: es crida moltes vegades per segon. Crea el `Paint` al constructor.
+- **No realitzis operacions pesades** (I/O, xarxa) dins de `onDraw()`.
+- Crida sempre `a.recycle()` després d'utilitzar un `TypedArray`.
 
 ---
 [M05](M05-Canvas-Basic) | [Home](Home) | [M07](M07-Canvas-Path)

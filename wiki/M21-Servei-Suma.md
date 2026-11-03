@@ -1,34 +1,34 @@
-# M21 – Calculation Service with BroadcastReceiver
+# M21 – Servei de càlcul amb BroadcastReceiver
 
-## Objective
-Learn how to implement a `Service` that performs a calculation (sum of two numbers) on a secondary thread and communicates the result to the Activity through a `BroadcastReceiver`. Demonstrates the bidirectional communication pattern between an Activity and a Service.
+## Objectiu
+Aprendre a implementar un `Service` que realitza un càlcul (suma de dos nombres) en un fil secundari i comunica el resultat a l'Activitat mitjançant un `BroadcastReceiver`. Demostra el patró de comunicació bidireccional entre una Activitat i un Servei.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M21_SumaServeiActivity.kt` | Activity with form and result receiver |
-| `M21_SumaService.kt` | Service that calculates the sum in the background |
-| `res/layout/m21_activity_suma_servei.xml` | Layout with fields and result |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M21_SumaServeiActivity.kt` | Activitat amb formulari i receptor de resultats |
+| `M21_SumaService.kt` | Servei que calcula la suma en segon pla |
+| `res/layout/m21_activity_suma_servei.xml` | Disseny amb camps i resultat |
 
-## Key Concepts
+## Conceptes clau
 
-### Communication Architecture
+### Arquitectura de comunicació
 
 ```
 [M21_SumaServeiActivity]
-    |  startService(intent with n1, n2)
+    |  startService(intent amb n1, n2)
     v
 [M21_SumaService]
-    |  ExecutorService.execute { result = n1 + n2 }
-    |  sendBroadcast(intent with result)
+    |  ExecutorService.execute { resultat = n1 + n2 }
+    |  sendBroadcast(intent amb resultat)
     v
-[BroadcastReceiver (inside the Activity)]
-    |  onReceive() -> update TextView
+[BroadcastReceiver (dins de l'Activitat)]
+    |  onReceive() -> actualitzar TextView
     v
-[UI updated]
+[UI actualitzada]
 ```
 
-### Service with ExecutorService
+### Servei amb ExecutorService
 
 ```kotlin
 class M21_SumaService : Service() {
@@ -41,11 +41,11 @@ class M21_SumaService : Service() {
             val n2 = it.getIntExtra("n2", 0)
 
             executor.execute {
-                val result = n1 + n2  // Calculation on a secondary thread
+                val result = n1 + n2  // Càlcul en un fil secundari
                 val resultIntent = Intent("edu.fje.smx8.SUMA_RESULTAT")
                 resultIntent.putExtra("suma", result)
-                sendBroadcast(resultIntent)  // Send result as a Broadcast
-                stopSelf(startId)            // Stop the Service when done
+                sendBroadcast(resultIntent)  // Enviar resultat com a Broadcast
+                stopSelf(startId)            // Aturar el Servei en acabar
             }
         }
         return START_NOT_STICKY
@@ -59,34 +59,34 @@ class M21_SumaService : Service() {
 }
 ```
 
-### BroadcastReceiver in the Activity
+### BroadcastReceiver a l'Activitat
 
 ```kotlin
 private lateinit var resultReceiver: BroadcastReceiver
 
-// Define the receiver
+// Definir el receptor
 resultReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val res = intent.getIntExtra("suma", 0)
-        resultView.text = res.toString()  // Update the UI
+        resultView.text = res.toString()  // Actualitzar la UI
     }
 }
 
-// Register the receiver (API 33+: must specify EXPORTED or NOT_EXPORTED)
+// Registrar el receptor (API 33+: cal especificar EXPORTED o NOT_EXPORTED)
 registerReceiver(
     resultReceiver,
     IntentFilter("edu.fje.smx8.SUMA_RESULTAT"),
     Context.RECEIVER_EXPORTED
 )
 
-// Unregister when the Activity is destroyed
+// Desregistrar quan l'Activitat es destrueixi
 override fun onDestroy() {
     super.onDestroy()
     unregisterReceiver(resultReceiver)
 }
 ```
 
-### Starting the Service from the Activity
+### Iniciar el Servei des de l'Activitat
 
 ```kotlin
 buttonSum.setOnClickListener {
@@ -99,41 +99,41 @@ buttonSum.setOnClickListener {
 ```
 
 ### Context.RECEIVER_EXPORTED (API 33+)
-From Android 14 (API 34), it is **mandatory** to specify whether the receiver can receive broadcasts from other applications:
+A partir d'Android 14 (API 34), és **obligatori** especificar si el receptor pot rebre broadcasts d'altres aplicacions:
 
-| Flag | Description |
+| Flag | Descripció |
 |------|-------------|
-| `Context.RECEIVER_EXPORTED` | Can receive broadcasts from other apps |
-| `Context.RECEIVER_NOT_EXPORTED` | Only broadcasts from the same app |
+| `Context.RECEIVER_EXPORTED` | Pot rebre broadcasts d'altres apps |
+| `Context.RECEIVER_NOT_EXPORTED` | Només broadcasts de la mateixa app |
 
-### Manifest Declaration
+### Declaració al Manifest
 ```xml
 <service android:name=".M21_SumaService"
          android:exported="false" />
 ```
 
-## Comparison: BroadcastReceiver vs Other Alternatives
+## Comparativa: BroadcastReceiver vs Altres alternatives
 
-| Mechanism | Advantage | Disadvantage |
-|-----------|-----------|-------------|
-| **BroadcastReceiver** | Simple, decoupled | Asynchronous, not guaranteed |
-| **ResultReceiver** | Direct, typed | More complex |
-| **LiveData/Flow** | Reactive, lifecycle-aware | Requires ViewModel |
-| **Bound Service** | Bidirectional | More complex to manage |
-| **Coroutines** | Modern, readable | Requires Kotlin Coroutines |
+| Mecanisme | Avantatge | Inconvenient |
+|-----------|-----------|--------------|
+| **BroadcastReceiver** | Sencill, desacoblat | Asíncron, no garantit |
+| **ResultReceiver** | Directe, tipat | Més complex |
+| **LiveData/Flow** | Reactiu, conscient del cicle de vida | Requereix ViewModel |
+| **Bound Service** | Bidireccional | Més complex de gestionar |
+| **Coroutines** | Modern, llegible | Requereix Kotlin Coroutines |
 
-## Service Lifecycle Summary
+## Resum del cicle de vida d'un Servei
 
 ```
 startService()
     |
     v
-onCreate()        <- called only once
+onCreate()        <- es crida només una vegada
     |
     v
-onStartCommand()  <- called every time the service is started
+onStartCommand()  <- es crida cada vegada que s'inicia el servei
     |
-    | [task completed]
+    | [tasca completada]
     v
 stopSelf() / stopService()
     |

@@ -1,17 +1,17 @@
-# M16 – XML Parsing
+# M16 – Lectura XML
 
-## Objective
-Learn how to read and parse XML files included in the application's resources (`assets/`) using `XmlPullParser`, and display the parsed data in a `ListView` with a custom adapter that supports stable IDs.
+## Objectiu
+Aprendre a llegir i processar fitxers XML inclosos en els recursos de l'aplicació (`assets/`) mitjançant `XmlPullParser`, i mostrar les dades processades en un `ListView` amb un adaptador personalitzat que admet identificadors estables.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M16_LecturaXMLActivity.kt` | Main activity with ListView |
-| `M16_LecturaXMLUtility.kt` | Utility class for XML parsing |
-| `assets/m16_curs.xml` | XML file with student data |
-| `res/layout/m16_lectura_xml.xml` | Layout with ListView |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M16_LecturaXMLActivity.kt` | Activitat principal amb ListView |
+| `M16_LecturaXMLUtility.kt` | Classe d'utilitat per al processament d'XML |
+| `assets/m16_curs.xml` | Fitxer XML amb dades d'alumnes |
+| `res/layout/m16_lectura_xml.xml` | Disseny amb ListView |
 
-## XML File Structure
+## Estructura del fitxer XML
 
 ```xml
 <!-- assets/m16_curs.xml -->
@@ -27,25 +27,25 @@ Learn how to read and parse XML files included in the application's resources (`
 </curs>
 ```
 
-## Key Concepts
+## Conceptes clau
 
-### AssetManager – Accessing Asset Files
-Files in `assets/` are accessed via `AssetManager`:
+### AssetManager – Accés a fitxers d'assets
+S'accedeix als fitxers de `assets/` mitjançant `AssetManager`:
 
 ```kotlin
 val inputStream = assets.open("m16_curs.xml")
 ```
 
-**Difference between `assets/` and `res/`:**
+**Diferència entre `assets/` i `res/`:**
 | | `assets/` | `res/raw/` |
 |---|---|---|
-| Access | `AssetManager.open()` | `resources.openRawResource(R.raw.xxx)` |
-| Subdirectories | Yes | No |
-| File types | Any | Any |
-| Referenced by R | No | Yes |
+| Accés | `AssetManager.open()` | `resources.openRawResource(R.raw.xxx)` |
+| Subdirectoris | Sí | No |
+| Tipus de fitxers | Qualsevol | Qualsevol |
+| Referenciat per R | No | Sí |
 
-### XmlPullParser – Pull XML Parsing
-`XmlPullParser` processes XML element by element, consuming it sequentially (pull pattern):
+### XmlPullParser – Processament XML tipus Pull
+`XmlPullParser` processa l melement XML a element, consumint-lo de forma seqüencial (patró pull):
 
 ```kotlin
 fun parseXml(input: InputStream): List<Student> {
@@ -53,40 +53,40 @@ fun parseXml(input: InputStream): List<Student> {
         val parser = Xml.newPullParser()
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
         parser.setInput(it, null)
-        parser.nextTag()          // Advance to the first element
+        parser.nextTag()          // Avançar al primer element
         return readStudents(parser)
     }
 }
 ```
 
-**Parser events:**
-| Event | Description |
-|-------|-------------|
-| `START_DOCUMENT` | Start of the document |
-| `START_TAG` | Opening tag `<name>` |
-| `TEXT` | Text content between tags |
-| `END_TAG` | Closing tag `</name>` |
-| `END_DOCUMENT` | End of the document |
+**Esdeveniments del parser:**
+| Esdeveniment | Descripció |
+|--------------|------------|
+| `START_DOCUMENT` | Inici del document |
+| `START_TAG` | Etiqueta d'obertura `<nom>` |
+| `TEXT` | Contingut de text entre etiquetes |
+| `END_TAG` | Etiqueta de tancament `</nom>` |
+| `END_DOCUMENT` | Final del document |
 
-### Recursive Node Reading
+### Lectura recursiva de nodes
 
 ```kotlin
 private fun readStudents(parser: XmlPullParser): List<Student> {
     val students = mutableListOf<Student>()
-    parser.require(XmlPullParser.START_TAG, null, "curs")  // Validates the tag
+    parser.require(XmlPullParser.START_TAG, null, "curs")  // Valida l'etiqueta
 
     while (parser.next() != XmlPullParser.END_TAG) {
         if (parser.eventType != XmlPullParser.START_TAG) continue
         when (parser.name) {
             "alumne" -> students.add(readStudent(parser))
-            else     -> skipTag(parser)  // Ignore unknown tags
+            else     -> skipTag(parser)  // Ignorar etiquetes desconegudes
         }
     }
     return students
 }
 
 private fun readStudent(parser: XmlPullParser): Student {
-    val dni = parser.getAttributeValue(null, "dni")  // Read attribute
+    val dni = parser.getAttributeValue(null, "dni")  // Llegir atribut
     var name: String? = null
     var surname: String? = null
 
@@ -102,7 +102,7 @@ private fun readStudent(parser: XmlPullParser): Student {
 }
 ```
 
-### Student Data Class
+### Classe de dades Student
 
 ```kotlin
 data class Student(val name: String?, val surname: String?, val dni: String?) {
@@ -110,8 +110,8 @@ data class Student(val name: String?, val surname: String?, val dni: String?) {
 }
 ```
 
-### Adapter with Stable IDs
-To avoid flickering when updating the `ListView`, the adapter implements `hasStableIds()`:
+### Adaptador amb IDs estables
+Per evitar parpellejos quan s'actualitza el `ListView`, l'adaptador implementa `hasStableIds()`:
 
 ```kotlin
 private class StableArrayAdapter(
@@ -127,7 +127,7 @@ private class StableArrayAdapter(
 }
 ```
 
-### Item Removal Animation
+### Animació de supressió d'elements
 
 ```kotlin
 list.setOnItemClickListener { parent, view, position, _ ->
@@ -138,17 +138,17 @@ list.setOnItemClickListener { parent, view, position, _ ->
         .withEndAction {
             itemNames.remove(item)
             adapter.notifyDataSetChanged()
-            view.alpha = 1f  // Restore for ViewHolder reuse
+            view.alpha = 1f  // Restaurar per a la reutilització de ViewHolder
         }
 }
 ```
 
-## XML Parser Comparison in Android
-| Parser | Model | Recommended for |
-|--------|-------|----------------|
-| `XmlPullParser` | Pull (event-driven) | Efficient, low memory usage |
-| `SAXParser` | Push (event-driven) | Large documents |
-| `DOM` | In-memory tree | Small documents, navigation |
+## Comparativa de parsers XML a Android
+| Parser | Model | Recomanat per a |
+|--------|-------|-----------------|
+| `XmlPullParser` | Pull (basat en esdeveniments) | Eficient, baix ús de memòria |
+| `SAXParser` | Push (basat en esdeveniments) | Documents grans |
+| `DOM` | Arbre en memòria | Documents petits, navegació |
 
 ---
 [M15](M15-OpenGL-ES-20) | [Home](Home) | [M17](M17-Fragments)

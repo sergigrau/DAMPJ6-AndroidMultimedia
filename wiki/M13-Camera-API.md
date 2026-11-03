@@ -1,44 +1,44 @@
-# M13 – Direct Camera Access (Camera2 API)
+# M13 – Accés directe a la càmera (Camera2 API)
 
-## Objective
-Learn how to access the camera hardware directly using the **Camera2 API**, which provides full control over the preview, capture, orientation and camera parameters. It is the recommended API for advanced camera applications.
+## Objectiu
+Aprendre a accedir directament al maquinari de la càmera mitjançant la **Camera2 API**, que proporciona control total sobre la vista prèvia, la captura, l'orientació i els paràmetres de la càmera. És l'API recomanada per a aplicacions de càmera avançades.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M13_CameraActivity.kt` | Main camera activity |
-| `res/layout/m12_camera.xml` | Layout with TextureView and Button |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M13_CameraActivity.kt` | Activitat principal de la càmera |
+| `res/layout/m12_camera.xml` | Disseny amb TextureView i Botó |
 
-## Key Concepts
+## Conceptes clau
 
-### Camera2 API Architecture
+### Arquitectura de la Camera2 API
 
 ```
-TextureView (preview)
+TextureView (vista prèvia)
     |
     v
-CameraManager -> opens CameraDevice
+CameraManager -> obre CameraDevice
     |
     v
-CameraDevice -> creates CameraCaptureSession
+CameraDevice -> crea CameraCaptureSession
     |
-    +-- TEMPLATE_PREVIEW        -> continuous preview
-    +-- TEMPLATE_STILL_CAPTURE  -> image capture
+    +-- TEMPLATE_PREVIEW        -> vista prèvia contínua
+    +-- TEMPLATE_STILL_CAPTURE  -> captura d'imatge
 ```
 
-### Camera Opening Flow
+### Flux d'obertura de la càmera
 
 ```kotlin
-// 1. Get the CameraManager
+// 1. Obtenir el CameraManager
 val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-val cameraId = manager.cameraIdList[0]  // Rear camera
+val cameraId = manager.cameraIdList[0]  // Càmera posterior
 
-// 2. Get characteristics (supported sizes)
+// 2. Obtenir característiques (mides suportades)
 val characteristics = manager.getCameraCharacteristics(cameraId)
 val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
 imageDimension = map.getOutputSizes(SurfaceTexture::class.java)[0]
 
-// 3. Open the camera
+// 3. Obrir la càmera
 manager.openCamera(cameraId, stateCallback, null)
 ```
 
@@ -47,7 +47,7 @@ manager.openCamera(cameraId, stateCallback, null)
 private val stateCallback = object : CameraDevice.StateCallback() {
     override fun onOpened(camera: CameraDevice) {
         cameraDevice = camera
-        startPreview()  // Start preview when camera is open
+        startPreview()  // Iniciar la vista prèvia quan la càmera estigui oberta
     }
     override fun onDisconnected(camera: CameraDevice) { camera.close() }
     override fun onError(camera: CameraDevice, error: Int) {
@@ -57,21 +57,21 @@ private val stateCallback = object : CameraDevice.StateCallback() {
 }
 ```
 
-### TextureView and SurfaceTextureListener
-`TextureView` shows the camera preview as a texture integrated into the layout:
+### TextureView i SurfaceTextureListener
+`TextureView` mostra la vista prèvia de la càmera com una textura integrada al disseny:
 
 ```kotlin
 textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, w: Int, h: Int) {
-        openCamera()  // Texture is available, open the camera
+        openCamera()  // La textura està disponible, obrir la càmera
     }
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = false
     // ...
 }
 ```
 
-### HandlerThread – Camera Threads
-The Camera2 API requires a dedicated thread for callbacks (the main thread cannot be used):
+### HandlerThread – Hils de la càmera
+La Camera2 API requereix un fil dedicat per a les crides de retorn (no es pot utilitzar el fil principal):
 
 ```kotlin
 protected fun startThread() {
@@ -87,7 +87,7 @@ protected fun stopThread() {
 }
 ```
 
-### Continuous Preview
+### Vista prèvia contínua
 ```kotlin
 protected fun startPreview() {
     val texture = textureView.surfaceTexture!!
@@ -108,13 +108,13 @@ protected fun startPreview() {
 }
 ```
 
-### Image Capture
+### Captura d'imatge
 
 ```kotlin
-// Create an ImageReader to receive the JPEG image
+// Crear un ImageReader per rebre la imatge JPEG
 val reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1)
 
-// Set the listener to process the image
+// Configurar el listener per processar la imatge
 reader.setOnImageAvailableListener({ r ->
     r.acquireLatestImage()?.use { image ->
         val buffer = image.planes[0].buffer
@@ -125,7 +125,7 @@ reader.setOnImageAvailableListener({ r ->
 }, backgroundHandler)
 ```
 
-### Orientation Handling
+### Gestió de l'orientació
 ```kotlin
 private val ORIENTATIONS = SparseIntArray().apply {
     append(Surface.ROTATION_0,   90)
@@ -138,7 +138,7 @@ val rotation = display?.rotation ?: Surface.ROTATION_0
 captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
 ```
 
-### Lifecycle and Camera
+### Cicle de vida i càmera
 ```kotlin
 override fun onResume() {
     super.onResume()
@@ -148,12 +148,12 @@ override fun onResume() {
 }
 
 override fun onPause() {
-    stopThread()  // Always stop the thread in onPause
+    stopThread()  // Aturar sempre el fil a onPause
     super.onPause()
 }
 ```
 
-## Required Permissions
+## Permisos requerits
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-feature android:name="android.hardware.camera2" android:required="true" />

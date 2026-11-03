@@ -1,57 +1,57 @@
-# M10 – Basic Animation with ObjectAnimator
+# M10 – Animació bàsica amb ObjectAnimator
 
-## Objective
-Learn how to animate view properties (`x`, `y`, `alpha`, `scaleX`, `rotation`...) with `ObjectAnimator`, the core of Android's Property Animation System.
+## Objectiu
+Aprendre a animar propietats de vistes (`x`, `y`, `alpha`, `scaleX`, `rotation`...) amb `ObjectAnimator`, el nucli del sistema d'animació de propietats d'Android.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M10_AnimacioBasica.kt` | Main activity |
-| `res/layout/m10_animacio_basica.xml` | Layout with Toolbar and FAB |
-
----
-
-# M11 – Sequential Animation with AnimatorSet
-
-## Objective
-Combine multiple `ObjectAnimator` instances in sequence or in parallel using `AnimatorSet`, and create cyclic animations that repeat indefinitely.
-
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M11_AnimacioRequadre.kt` | Main activity |
-| `res/layout/m11_animacio_requadre.xml` | Layout with a Button |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M10_AnimacioBasica.kt` | Activitat principal |
+| `res/layout/m10_animacio_basica.xml` | Disseny amb Toolbar i FAB |
 
 ---
 
-## Key Concepts (M10 and M11)
+# M11 – Animació seqüencial amb AnimatorSet
 
-### ObjectAnimator – Single Property Animation
-`ObjectAnimator` animates a specific property of an object from a start value to an end value:
+## Objectiu
+Combinar múltiples instàncies d'`ObjectAnimator` en seqüència o en paral·lel mitjançant `AnimatorSet`, i crear animacions cícliques que es repeteixen indefinidament.
+
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M11_AnimacioRequadre.kt` | Activitat principal |
+| `res/layout/m11_animacio_requadre.xml` | Disseny amb un Botó |
+
+---
+
+## Conceptes clau (M10 i M11)
+
+### ObjectAnimator – Animació d'una sola propietat
+`ObjectAnimator` anima una propietat específica d'un objecte des d'un valor inicial fins a un de final:
 
 ```kotlin
-// Move the FAB vertically to the middle of the screen
+// Moure el FAB verticalment fins al mig de la pantalla
 val anim = ObjectAnimator.ofFloat(fab, "y", 0f, height / 2f)
 anim.duration = 1000  // ms
 anim.start()
 
-// Fade the FAB out
+// Desfermat (fade out) del FAB
 val animAlpha = ObjectAnimator.ofFloat(fab, "alpha", 1f, 0f)
 animAlpha.duration = 1000
 animAlpha.start()
 ```
 
-### Animatable Properties
-| Property (String) | Description |
-|-------------------|-------------|
-| `"x"`, `"y"` | Absolute position |
-| `"translationX"`, `"translationY"` | Relative displacement |
-| `"alpha"` | Transparency (0.0 = transparent, 1.0 = opaque) |
-| `"scaleX"`, `"scaleY"` | Horizontal / vertical scale |
-| `"rotation"` | Rotation in degrees |
-| `"rotationX"`, `"rotationY"` | 3D rotation |
+### Propietats animables
+| Propietat (String) | Descripció |
+|-------------------|------------|
+| `"x"`, `"y"` | Posició absoluta |
+| `"translationX"`, `"translationY"` | Desplaçament relatiu |
+| `"alpha"` | Transparència (0.0 = transparent, 1.0 = opac) |
+| `"scaleX"`, `"scaleY"` | Escala horitzontal / vertical |
+| `"rotation"` | Rotació en graus |
+| `"rotationX"`, `"rotationY"` | Rotació 3D |
 
-### AnimatorSet – Combining Animators
+### AnimatorSet – Combinació d'animadors
 
 ```kotlin
 val anim1 = ObjectAnimator.ofFloat(button, "x", 0f, (width - button.width).toFloat()).apply { duration = 1000 }
@@ -64,27 +64,27 @@ animSet.playSequentially(anim1, anim2, anim3, anim4)
 animSet.start()
 ```
 
-**Combination modes:**
-| Method | Behaviour |
-|--------|-----------|
-| `playSequentially(a1, a2, a3)` | One after another |
-| `playTogether(a1, a2, a3)` | All at the same time |
-| `play(a1).before(a2)` | a1 first, then a2 |
-| `play(a1).after(a2)` | a2 first, then a1 |
-| `play(a1).with(a2)` | Both at the same time |
+**Modes de combinació:**
+| Mètode | Comportament |
+|--------|--------------|
+| `playSequentially(a1, a2, a3)` | Un rere l'altre |
+| `playTogether(a1, a2, a3)` | Tots al mateix temps |
+| `play(a1).before(a2)` | a1 primer, després a2 |
+| `play(a1).after(a2)` | a2 primer, després a1 |
+| `play(a1).with(a2)` | Tots dos al mateix temps |
 
-### Infinite Loop with AnimatorListenerAdapter
+### Bucle infinit amb AnimatorListenerAdapter
 
 ```kotlin
 animSet.addListener(object : AnimatorListenerAdapter() {
     override fun onAnimationEnd(a: Animator) {
         super.onAnimationEnd(a)
-        animSet.start()  // Restart when finished -> infinite loop
+        animSet.start()  // Reiniciar quan acabi -> bucle infinit
     }
 })
 ```
 
-### WindowMetrics (API 30+) to Get Screen Dimensions
+### WindowMetrics (API 30+) per obtenir dimensions de la pantalla
 
 ```kotlin
 val metrics: WindowMetrics = windowManager.currentWindowMetrics
@@ -93,23 +93,23 @@ val height = bounds.height()
 val width  = bounds.width()
 ```
 
-### Interpolators – Animation Speed
-`ObjectAnimator` accepts `interpolators` to control the pace:
+### Interpoladors – Velocitat de l'animació
+`ObjectAnimator` accepta `interpolators` per controlar el ritme:
 
 ```kotlin
-anim.interpolator = AccelerateDecelerateInterpolator() // Default
-anim.interpolator = BounceInterpolator()               // Bounce effect
-anim.interpolator = OvershootInterpolator()            // Overshoots end point
-anim.interpolator = LinearInterpolator()               // Constant speed
+anim.interpolator = AccelerateDecelerateInterpolator() // Per defecte
+anim.interpolator = BounceInterpolator()               // Efecte de rebot
+anim.interpolator = OvershootInterpolator()            // Sobrepassa el punt final
+anim.interpolator = LinearInterpolator()               // Velocitat constant
 ```
 
-## M10 vs M11 Comparison
+## Comparativa M10 vs M11
 | | M10 | M11 |
 |---|---|---|
-| Animators | 1 per property | 4 combined |
-| Combination | Independent | `AnimatorSet.playSequentially` |
-| Loop | No | Yes (listener) |
-| Effects | Translation + Alpha | Rectangular translation |
+| Animadors | 1 per propietat | 4 combinats |
+| Combinació | Independent | `AnimatorSet.playSequentially` |
+| Bucle | No | Sí (listener) |
+| Efectes | Traslació + Alpha | Traslació rectangular |
 
 ---
 [M09](M09-Propietats-Dinamiques) | [Home](Home) | [M12](M12-Camera-Intent)

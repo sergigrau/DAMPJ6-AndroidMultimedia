@@ -1,17 +1,17 @@
-# M14 – Load Image from Gallery
+# M14 – Carregar imatge de la galeria
 
-## Objective
-Learn how to select an image from the device gallery using `ContentResolver` and `Uri`, following Android 13+ (API 33) best practices that avoid direct access to file system paths.
+## Objectiu
+Aprendre a seleccionar una imatge de la galeria del dispositiu utilitzant `ContentResolver` i `Uri`, seguint les bones pràctiques d'Android 13+ (API 33) que eviten l'accés directe a rutes de fitxers.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M14_ImatgeDeSDActivity.kt` | Main activity |
-| `res/layout/m14_imatges_sd.xml` | Layout with ImageView |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M14_ImatgeDeSDActivity.kt` | Activitat principal |
+| `res/layout/m14_imatges_sd.xml` | Disseny amb ImageView |
 
-## Key Concepts
+## Conceptes clau
 
-### ActivityResultLauncher for Image Selection
+### ActivityResultLauncher per a la selecció d'imatges
 
 ```kotlin
 private val imagePickerLauncher: ActivityResultLauncher<Intent> =
@@ -19,7 +19,7 @@ private val imagePickerLauncher: ActivityResultLauncher<Intent> =
         if (result.resultCode == RESULT_OK && result.data != null) {
             val uri: Uri? = result.data!!.data
 
-            // Open an InputStream from the Uri (not from a file path)
+            // Obrir un InputStream des de l'Uri (no pas des d'una ruta de fitxer)
             val inputStream = uri?.let { contentResolver.openInputStream(it) }
             val bitmap = BitmapFactory.decodeStream(inputStream)
             imageView.setImageBitmap(bitmap)
@@ -33,84 +33,84 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-### Why Uri Instead of a File Path?
-From Android 10 (API 29) onwards, and fully enforced in API 33, direct access to external files (`/storage/emulated/0/...`) was **restricted**. `ContentResolver` with `Uri` must be used instead:
+### Per què Uri en lloc d'una ruta de fitxer?
+A partir d'Android 10 (API 29) i de forma estricta des de l'API 33, l'accés directe als fitxers externs (`/storage/emulated/0/...`) està **restringit**. S'ha d'utilitzar `ContentResolver` amb `Uri`:
 
 ```kotlin
-// Deprecated / does not work from API 29+
+// Obsolet / no funciona a partir de l'API 29+
 val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
 val bitmap = BitmapFactory.decodeFile(path)
 
-// Correct (API 29+)
+// Correcte (API 29+)
 val inputStream = contentResolver.openInputStream(uri)
 val bitmap = BitmapFactory.decodeStream(inputStream)
 ```
 
-### ACTION_PICK Intent
-Opens the system gallery selector:
+### Intent ACTION_PICK
+Obre el selector de la galeria del sistema:
 
 ```kotlin
 val intent = Intent(
     Intent.ACTION_PICK,
-    MediaStore.Images.Media.EXTERNAL_CONTENT_URI  // External image gallery
+    MediaStore.Images.Media.EXTERNAL_CONTENT_URI  // Galeria d'imatges externa
 )
 ```
 
 **Alternatives:**
-| Intent Action | Description |
-|--------------|-------------|
-| `ACTION_PICK` | Native gallery selector |
-| `ACTION_GET_CONTENT` | Generic file selector |
-| `ACTION_OPEN_DOCUMENT` | Persistent document access |
+| Acció Intent | Descripció |
+|--------------|------------|
+| `ACTION_PICK` | Selector de galeria natiu |
+| `ACTION_GET_CONTENT` | Selector de fitxers genèric |
+| `ACTION_OPEN_DOCUMENT` | Accés persistent a documents |
 
-### ContentResolver – Access to Content Providers
-`ContentResolver` is the gateway to system `ContentProvider` instances (gallery, contacts, calendar...):
+### ContentResolver – Accés a Content Providers
+`ContentResolver` és la porta d'accés a les instàncies de `ContentProvider` del sistema (galeria, contactes, calendari...):
 
 ```kotlin
-// Read an image
+// Llegir una imatge
 val inputStream = contentResolver.openInputStream(uri)
 
-// Read metadata
+// Llegir metadades
 val cursor = contentResolver.query(uri, null, null, null, null)
 
-// Delete
+// Esborrar
 contentResolver.delete(uri, null, null)
 ```
 
 ### BitmapFactory
-Decodes images from various sources:
+Decodifica imatges des de diverses fonts:
 
 ```kotlin
-// From InputStream (recommended for Uri)
+// Des de InputStream (recomanat per a Uri)
 BitmapFactory.decodeStream(inputStream)
 
-// From file (deprecated for external files)
+// Des de fitxer (obsolet per a fitxers externs)
 BitmapFactory.decodeFile(path)
 
-// From resources
+// Des de recursos
 BitmapFactory.decodeResource(resources, R.drawable.image)
 
-// With options to reduce size (avoid OOM)
+// Amb opcions per reduir la mida (evita OOM)
 val options = BitmapFactory.Options().apply {
-    inSampleSize = 4  // Reads 1 out of every 4 pixels
+    inSampleSize = 4  // Llegeix 1 de cada 4 píxels
 }
 BitmapFactory.decodeStream(inputStream, null, options)
 ```
 
-## Required Permissions (API 33+)
+## Permisos requerits (API 33+)
 ```xml
-<!-- For Android 13+ (API 33) -->
+<!-- Per a Android 13+ (API 33) -->
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
-<!-- For Android 12 and below -->
+<!-- Per a Android 12 i inferiors -->
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
     android:maxSdkVersion="32" />
 ```
 
-## Best Practices
-- Always close the `InputStream` after use (using `use { }` in Kotlin).
-- For large images, use `BitmapFactory.Options.inSampleSize` to reduce resolution and avoid `OutOfMemoryError`.
-- Do not decode the Bitmap on the main thread if the image can be large.
+## Bones pràctiques
+- Tancar sempre l'`InputStream` després d'utilitzar-lo (utilitzant `use { }` en Kotlin).
+- Per a imatges grans, utilitzar `BitmapFactory.Options.inSampleSize` per reduir la resolució i evitar `OutOfMemoryError`.
+- No decodificar el Bitmap al fil principal si la imatge pot ser gran.
 
 ---
 [M13](M13-Camera-API) | [Home](Home) | [M15](M15-OpenGL-ES-20)

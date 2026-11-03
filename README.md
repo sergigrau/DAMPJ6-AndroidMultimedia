@@ -40,4 +40,4 @@ Col·lecció d'exercicis pràctics de desenvolupament d'aplicacions Android per 
 > Primer cal habilitar la Wiki al repositori: **Settings → Features → Wikis ✓**
 
 ---
-**Autor:** sergi.grau@fje.edu · **Versió:** 6.0 · **Curs:** 2025-2026
+**Autor:** sergi.grau@fje.edu · **Versió:** 6.0 · **Curs:** 2026-2027

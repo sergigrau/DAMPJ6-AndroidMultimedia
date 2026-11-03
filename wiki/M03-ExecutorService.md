@@ -1,29 +1,29 @@
-# M03 – Background Tasks with ExecutorService
+# M03 – Tasques en Segon Pla amb ExecutorService
 
-## Objective
-Learn how to run heavy tasks on a secondary thread without blocking the user interface, using `ExecutorService` (the modern replacement for the `AsyncTask` class deprecated in API 30). Combined with `ObjectAnimator` and `AnimatorSet` animations.
+## Objectiu
+Aprendre a executar tasques pesades en un fil secundari sense bloquejar la interfície d'usuari, utilitzant `ExecutorService` (el substitut modern de la classe `AsyncTask` deprecada a l'API 30). Combinat amb animacions `ObjectAnimator` i `AnimatorSet`.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M03_ExecutorServiceActivity.kt` | Main activity |
-| `res/layout/m03_asyntask.xml` | Layout with Button and ListView |
+## Fitxers Involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M03_ExecutorServiceActivity.kt` | Activity principal |
+| `res/layout/m03_asyntask.xml` | Layout amb Button i ListView |
 
-## Key Concepts
+## Conceptes Clau
 
-### Why ExecutorService?
-`AsyncTask` was deprecated in **Android 11 (API 30)** due to memory leak issues and inconsistent behaviour on configuration changes. `ExecutorService` is the recommended alternative:
+### Per què ExecutorService?
+`AsyncTask` va ser deprecada a **Android 11 (API 30)** a causa de problemes de fuites de memòria i comportament inconsistent en canvis de configuració. `ExecutorService` és l'alternativa recomanada:
 
 ```kotlin
-// Create a single-thread executor
+// Crea un executor d'un sol fil
 private val executor: ExecutorService = Executors.newSingleThreadExecutor()
 
-// Execute a task on a background thread
+// Executa una tasca en un fil secundari
 executor.execute {
-    // Code that runs on a secondary thread
+    // Codi que s'executa en un fil secundari
     val result = performExpensiveCalculation()
 
-    // Update the UI -> always on the main thread
+    // Actualitza la IU -> sempre al fil principal
     runOnUiThread {
         valueList.add(result)
         adapter.notifyDataSetChanged()
@@ -31,21 +31,21 @@ executor.execute {
 }
 ```
 
-### Golden rule: UI always on the main thread
-Android does not allow modifying the UI from secondary threads. Any visual update must be done with `runOnUiThread { }`:
+### Regla d'or: la IU sempre al fil principal
+Android no permet modificar la IU des de fils secundaris. Qualsevol actualització visual s'ha de fer amb `runOnUiThread { }`:
 
 ```kotlin
 executor.execute {
-    val result = counter++.toString()   // secondary thread
+    val result = counter++.toString()   // fil secundari
     runOnUiThread {
-        values.add(result)              // main thread
-        adapter.notifyDataSetChanged()  // main thread
+        values.add(result)              // fil principal
+        adapter.notifyDataSetChanged()  // fil principal
     }
 }
 ```
 
 ### WindowMetrics (API 30+)
-To get screen dimensions without the deprecated `getDefaultDisplay()` method:
+Per obtenir les dimensions de la pantalla sense el mètode deprecat `getDefaultDisplay()`:
 
 ```kotlin
 val bounds: Rect = windowManager.currentWindowMetrics.bounds
@@ -53,7 +53,7 @@ val width  = bounds.width()
 val height = bounds.height()
 ```
 
-### AnimatorSet – Sequential button animation
+### AnimatorSet – Animació seqüencial de botons
 ```kotlin
 val anim1 = ObjectAnimator.ofFloat(button, "x", 0f, width.toFloat())
 val anim2 = ObjectAnimator.ofFloat(button, "y", 0f, height.toFloat())
@@ -63,50 +63,50 @@ val animSet = AnimatorSet()
 animSet.playSequentially(anim1, anim2, anim3, anim4)
 animSet.addListener(object : AnimatorListenerAdapter() {
     override fun onAnimationEnd(a: Animator) {
-        runTask()      // New task when the animation ends
-        animSet.start() // Restart the animation in a loop
+        runTask()       // Nova tasca quan acaba l'animació
+        animSet.start() // Reinicia l'animació en bucle
     }
 })
 animSet.start()
 ```
 
-### Proper executor shutdown
+### Tancament correcte de l'executor
 ```kotlin
 override fun onDestroy() {
     super.onDestroy()
-    executor.shutdown()  // Release thread pool resources
+    executor.shutdown()  // Allibera els recursos del pool de fils
 }
 ```
 
-## Execution Flow
+## Flux d'Execució
 
 ```
-Button click
+Clic al botó
     |
     v
-Start AnimatorSet (4 sequential animations)
+Inicia AnimatorSet (4 animacions seqüencials)
     |
     v
 onAnimationEnd()
     |
-    +-- executor.execute {           <- secondary thread
+    +-- executor.execute {           <- fil secundari
     |       val result = counter++
     |       runOnUiThread {
-    |           list.add(result)     <- UI thread
+    |           list.add(result)     <- fil de la IU
     |           adapter.notifyDataSetChanged()
     |       }
     |   }
     |
-    +-- animSet.start()  <- restart
+    +-- animSet.start()  <- reinicia
 ```
 
-## Available Executor Types
-| Factory | Description |
-|---------|-------------|
-| `newSingleThreadExecutor()` | Single thread, tasks queued |
-| `newFixedThreadPool(n)` | Pool of n threads |
-| `newCachedThreadPool()` | Dynamic pool, creates threads as needed |
-| `newScheduledThreadPool(n)` | For scheduled tasks |
+## Tipus d'Executors Disponibles
+| Fàbrica | Descripció |
+|---------|------------|
+| `newSingleThreadExecutor()` | Un sol fil, tasques en cua |
+| `newFixedThreadPool(n)` | Pool de n fils |
+| `newCachedThreadPool()` | Pool dinàmic, crea fils segons calgui |
+| `newScheduledThreadPool(n)` | Per a tasques programades |
 
 ---
 [M02](M02-Audio-Service) | [Home](Home) | [M04](M04-Notificacions-SnackBar)

@@ -1,28 +1,28 @@
 # M18 – Firebase Realtime Database
 
-## Objective
-Learn how to integrate **Firebase Realtime Database** into an Android application to store, read and display data in real time in the cloud, without authentication. Implements a basic CRUD for musical artists.
+## Objectiu
+Aprendre a integrar **Firebase Realtime Database** en una aplicació Android per emmagatzemar, llegir i mostrar dades en temps real al núvol, sense autenticació. Implementa un CRUD bàsic per a artistes musicals.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M18_Firebase_Artistes.kt` | Main activity with list and form |
-| `M18_Artista.kt` | Artist entity data class |
-| `M18_Llista.kt` | Custom ListView adapter |
-| `res/layout/m18_firebase.xml` | Main layout |
-| `res/layout/m18_llista.xml` | Layout for each list item |
-| `google-services.json` | Firebase credentials (not included in repo) |
+## Fitxers involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M18_Firebase_Artistes.kt` | Activitat principal amb llista i formulari |
+| `M18_Artista.kt` | Classe de dades de l'entitat Artista |
+| `M18_Llista.kt` | Adaptador personalitzat de ListView |
+| `res/layout/m18_firebase.xml` | Disseny principal |
+| `res/layout/m18_llista.xml` | Disseny per a cada element de la llista |
+| `google-services.json` | Credencials de Firebase (no inclòs al repositori) |
 
-## Key Concepts
+## Conceptes clau
 
-### Firebase Setup
-1. Create a project at [Firebase Console](https://console.firebase.google.com/).
-2. Add an Android app with the package `edu.fje.dam2`.
-3. Download `google-services.json` and place it in `app/`.
-4. Enable **Realtime Database** in test mode.
+### Configuració de Firebase
+1. Crear un projecte a la [Consola de Firebase](https://console.firebase.google.com/).
+2. Afegir una aplicació Android amb el paquet `edu.fje.dam2`.
+3. Descarregar `google-services.json` i col·locar-lo a `app/`.
+4. Habilitar **Realtime Database** en mode de proves.
 
-### Data Class with Firebase
-Firebase requires a class with a **no-argument constructor** and public properties:
+### Classe de dades amb Firebase
+Firebase requereix una classe amb un **constructor sense arguments** i propietats públiques:
 
 ```kotlin
 @IgnoreExtraProperties
@@ -31,19 +31,19 @@ data class M18_Artista(
     val nom: String = "",
     val genere: String = ""
 )
-// Kotlin data class with default values = implicit no-arg constructor
+// Classe de dades Kotlin amb valors per defecte = constructor sense arguments implícit
 ```
 
-> `@IgnoreExtraProperties` tells Firebase to ignore database fields that do not exist in the class.
+> `@IgnoreExtraProperties` indica a Firebase que ignori els camps de la base de dades que no existeixen a la classe.
 
-### Database Reference
+### Referència de la base de dades
 
 ```kotlin
-// Get a reference to the "artistes" node
+// Obtenir una referència al node "artistes"
 val DBArtistes: DatabaseReference = FirebaseDatabase.getInstance().getReference("artistes")
 ```
 
-### Reading Data in Real Time (ValueEventListener)
+### Lectura de dades en temps real (ValueEventListener)
 ```kotlin
 DBArtistes.addValueEventListener(object : ValueEventListener {
     override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -52,23 +52,23 @@ DBArtistes.addValueEventListener(object : ValueEventListener {
             val artist = postSnapshot.getValue(M18_Artista::class.java)
             artist?.let { artists.add(it) }
         }
-        // Update the UI
+        // Actualitzar la UI
         listView.adapter = M18_Llista(this@M18_Firebase_Artistes, artists)
     }
 
     override fun onCancelled(databaseError: DatabaseError) {
-        // Handle error
+        // Gestionar l'error
     }
 })
 ```
 
-**Listener types:**
-| Listener | When triggered |
-|----------|---------------|
-| `addValueEventListener` | On every change (real time) |
-| `addListenerForSingleValueEvent` | Only once |
+**Tipus de listeners:**
+| Listener | Quan es dispara |
+|----------|-----------------|
+| `addValueEventListener` | A cada canvi (temps real) |
+| `addListenerForSingleValueEvent` | Només una vegada |
 
-### Writing Data (push + setValue)
+### Escriure dades (push + setValue)
 
 ```kotlin
 private fun addArtist() {
@@ -76,18 +76,18 @@ private fun addArtist() {
     val genreText = genreSpinner.selectedItem.toString()
 
     if (nameText.isNotEmpty()) {
-        // push() generates a unique key
+        // push() genera una clau única
         val id = DBArtistes.push().key
 
         if (id != null) {
             val artist = M18_Artista(id, nameText, genreText)
-            DBArtistes.child(id).setValue(artist)  // Writes to /artistes/{id}
+            DBArtistes.child(id).setValue(artist)  // Escriu a /artistes/{id}
         }
     }
 }
 ```
 
-**Firebase database structure:**
+**Estructura de la base de dades Firebase:**
 ```json
 {
   "artistes": {
@@ -99,13 +99,13 @@ private fun addArtist() {
     "-NxKjhXYZ456": {
       "id": "-NxKjhXYZ456",
       "nom": "Mozart",
-      "genere": "Classical"
+      "genere": "Clàssica"
     }
   }
 }
 ```
 
-### Custom Adapter M18_Llista
+### Adaptador personalitzat M18_Llista
 
 ```kotlin
 class M18_Llista(private val context: Activity, private val artists: List<M18_Artista>) :
@@ -124,16 +124,16 @@ class M18_Llista(private val context: Activity, private val artists: List<M18_Ar
 ```
 
 ### Firebase BOM (Bill of Materials)
-The BOM automatically synchronises the versions of all Firebase libraries:
+El BOM sincronitza automàticament les meves versions de totes les llibreries de Firebase:
 
 ```kotlin
 // build.gradle.kts
 implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-implementation("com.google.firebase:firebase-database")  // No explicit version needed
+implementation("com.google.firebase:firebase-database")  // No cal versió explícita
 ```
 
-## Firebase Security Rules
-For testing (no authentication):
+## Regles de seguretat de Firebase
+Per a proves (sense autenticació):
 ```json
 {
   "rules": {
@@ -143,15 +143,15 @@ For testing (no authentication):
 }
 ```
 
-> These rules allow public access. In production, authentication is required.
+> Aquestes regles permeten l'accés públic. En producció, cal requerir autenticació.
 
-## Firebase CRUD Operations
-| Operation | Method |
+## Operacions CRUD a Firebase
+| Operació | Mètode |
 |-----------|--------|
-| **Create** | `ref.push().setValue(obj)` |
-| **Read** | `ref.addValueEventListener(...)` |
-| **Update** | `ref.child(id).updateChildren(map)` |
-| **Delete** | `ref.child(id).removeValue()` |
+| **Crear** | `ref.push().setValue(obj)` |
+| **Llegir** | `ref.addValueEventListener(...)` |
+| **Actualitzar** | `ref.child(id).updateChildren(map)` |
+| **Esborrar** | `ref.child(id).removeValue()` |
 
 ---
 [M17](M17-Fragments) | [Home](Home) | [M19](M19-Animacio-Descriptor)

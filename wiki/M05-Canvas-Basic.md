@@ -1,67 +1,67 @@
-# M05 – Basic Canvas
+# M05 – Canvas Bàsic
 
-## Objective
-Introduce the Android `Canvas` class to draw basic geometric shapes onto a `Bitmap` and display the result in an `ImageView`. This is the foundation for all custom 2D drawing in Android.
+## Objectiu
+Introduir la classe `Canvas` d'Android per dibuixar figures geomètriques bàsiques sobre un `Bitmap` i mostrar el resultat en un `ImageView`. Aquesta és la base de tot el dibuix 2D personalitzat a Android.
 
-## Files Involved
-| File | Description |
-|------|-------------|
-| `M05_CanvasBasic.kt` | Main activity |
-| `res/layout/m05_canvas_basic_principal.xml` | Layout with Toolbar and ImageView |
+## Fitxers Involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M05_CanvasBasic.kt` | Activity principal |
+| `res/layout/m05_canvas_basic_principal.xml` | Layout amb Toolbar i ImageView |
 
-## Key Concepts
+## Conceptes Clau
 
-### The Drawing Triad: Bitmap + Canvas + Paint
+### La Tríada de Dibuix: Bitmap + Canvas + Paint
 
 ```
-Bitmap  <- pixel surface (the "paper")
+Bitmap  <- superfície de píxels (el "paper")
   |
-Canvas  <- drawing tools (the "pencil")
+Canvas  <- eines de dibuix (el "llapis")
   |
-Paint   <- visual configuration (the "colour/thickness")
+Paint   <- configuració visual (el "color/gruix")
 ```
 
-### Basic Creation and Usage
+### Creació i Ús Bàsic
 
 ```kotlin
-// 1. Create the Bitmap (100x100 pixels, ARGB colour)
+// 1. Crea el Bitmap (100x100 píxels, color ARGB)
 val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
 
-// 2. Create the Canvas associated with the Bitmap
+// 2. Crea el Canvas associat al Bitmap
 val canvas = Canvas(bitmap)
 
-// 3. Create the Paint with configuration
+// 3. Crea el Paint amb configuració
 val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 paint.color = Color.BLACK
 
-// 4. Draw shapes
+// 4. Dibuixa figures
 canvas.drawRect(10f, 10f, 50f, 50f, paint)
 canvas.drawCircle(50f, 50f, 10f, paint)
 
-// 5. Display the Bitmap in an ImageView
+// 5. Mostra el Bitmap en un ImageView
 imageView.setImageBitmap(bitmap)
 ```
 
-### Main Canvas Methods
-| Method | Description |
-|--------|-------------|
-| `drawRect(l, t, r, b, paint)` | Draws a rectangle |
-| `drawCircle(cx, cy, r, paint)` | Draws a circle |
-| `drawLine(x1, y1, x2, y2, paint)` | Draws a line |
-| `drawText(text, x, y, paint)` | Draws text |
-| `drawPath(path, paint)` | Draws a complex path |
-| `drawBitmap(bmp, x, y, paint)` | Draws another Bitmap |
-| `drawColor(color)` | Fills the canvas with a colour |
+### Mètodes Principals de Canvas
+| Mètode | Descripció |
+|--------|------------|
+| `drawRect(l, t, r, b, paint)` | Dibuixa un rectangle |
+| `drawCircle(cx, cy, r, paint)` | Dibuixa un cercle |
+| `drawLine(x1, y1, x2, y2, paint)` | Dibuixa una línia |
+| `drawText(text, x, y, paint)` | Dibuixa text |
+| `drawPath(path, paint)` | Dibuixa un camí complex |
+| `drawBitmap(bmp, x, y, paint)` | Dibuixa un altre Bitmap |
+| `drawColor(color)` | Omple el canvas amb un color |
 
-### Colour in Android
+### Color a Android
 ```kotlin
-// Predefined colours
+// Colors predefinits
 Color.BLACK, Color.RED, Color.WHITE...
 
-// Custom ARGB colour (alpha, red, green, blue)
-Color.argb(255, 128, 0, 255)  // Opaque violet
+// Color ARGB personalitzat (alfa, vermell, verd, blau)
+Color.argb(255, 128, 0, 255)  // Violeta opac
 
-// Random colour
+// Color aleatori
 Color.argb(
     (Math.random() * 255).toInt(),
     (Math.random() * 255).toInt(),
@@ -70,26 +70,26 @@ Color.argb(
 )
 ```
 
-### Bitmap Configuration
-| Config | Bits per pixel | Use |
-|--------|---------------|-----|
-| `ARGB_8888` | 32 bits | Maximum quality (recommended) |
-| `RGB_565` | 16 bits | Less memory, no transparency |
-| `ALPHA_8` | 8 bits | Alpha mask only |
+### Configuració de Bitmap
+| Configuració | Bits per píxel | Ús |
+|--------------|----------------|----|
+| `ARGB_8888` | 32 bits | Màxima qualitat (recomanat) |
+| `RGB_565` | 16 bits | Menys memòria, sense transparència |
+| `ALPHA_8` | 8 bits | Només màscara alfa |
 
 ### Paint.ANTI_ALIAS_FLAG
-Smooths the edges of shapes to avoid the "staircase" effect (aliasing):
+Suavitza les vores de les figures per evitar l'efecte "escala" (aliasing):
 
 ```kotlin
-// Without antialiasing: jagged edges
+// Sense antialiasing: vores serrades
 val paint = Paint()
 
-// With antialiasing: smooth edges
+// Amb antialiasing: vores suaus
 val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 ```
 
-## Limitation of This Approach
-Drawing onto a `Bitmap` is static. For **dynamic** drawing (changing in response to the user), a custom `View` with an overridden `onDraw()` method is needed. See M06 and M07.
+## Limitació d'Aquest Enfocament
+Dibuixar sobre un `Bitmap` és estàtic. Per a un dibuix **dinàmic** (que canviï en resposta a l'usuari), cal una `View` personalitzada amb el mètode `onDraw()` sobreescrit. Vegeu M06 i M07.
 
 ---
 [M04](M04-Notificacions-SnackBar) | [Home](Home) | [M06](M06-Canvas-Personalitzat)
