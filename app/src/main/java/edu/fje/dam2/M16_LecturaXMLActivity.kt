@@ -1,70 +1,90 @@
 package edu.fje.dam2
 
-import android.content.Context
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.ListView
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import org.xmlpull.v1.XmlPullParserException
-import java.io.IOException
-import java.util.HashMap
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import edu.fje.dam2.databinding.M16LecturaXmlBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
- * Classe que llegeix un XML contingut en l'aplicació i mostra una ListView.
+ * Activitat que llegeix un XML contingut en l'aplicació en segon pla
+ * utilitzant Kotlin Coroutines i el mostra en un Jetpack RecyclerView amb ListAdapter.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 (API 33) 19.04.2026
+ * @version 7.0 (API 36) 2026
  */
 class M16_LecturaXMLActivity : AppCompatActivity() {
 
-    private lateinit var llistaNoms: ArrayList<String>
+    private lateinit var binding: M16LecturaXmlBinding
+    private lateinit var adapter: AlumneAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m16_lectura_xml)
-        val llista: ListView = findViewById(R.id.llistaXML)
+        binding = M16LecturaXmlBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val lecturaXML = M16_LecturaXMLUtility()
-        var llistaAlumnes: List<M16_LecturaXMLUtility.Alumne>? = null
-        try {
-            val inputStream = assets.open("m16_curs.xml")
-            llistaAlumnes = lecturaXML.analitzarXML(inputStream)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: XmlPullParserException) {
-            e.printStackTrace()
+        adapter = AlumneAdapter { alumne ->
+            val actualList = adapter.currentList.toMutableList()
+            actualList.remove(alumne)
+            adapter.submitList(actualList)
         }
 
-        llistaNoms = ArrayList()
-        llistaAlumnes?.forEach { llistaNoms.add(it.toString()) }
+        binding.llistaXML.layoutManager = LinearLayoutManager(this)
+        binding.llistaXML.adapter = adapter
 
-        val adapter = ArrayAdaptarEstable(this, android.R.layout.simple_list_item_1, llistaNoms)
-        llista.adapter = adapter
+        carregarXmlCorrutina()
+    }
 
-        llista.setOnItemClickListener { parent, view, position, _ ->
-            val item = parent.getItemAtPosition(position) as String
-            view.animate().setDuration(2000).alpha(0f).withEndAction {
-                llistaNoms.remove(item)
-                adapter.notifyDataSetChanged()
-                view.alpha = 1f
+    private fun carregarXmlCorrutina() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val lecturaXML = M16_LecturaXMLUtility()
+            val alumnes = try {
+                assets.open("m16_curs.xml").use { inputStream ->
+                    lecturaXML.analitzarXML(inputStream)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
+            }
+
+            val llistaNoms = alumnes.map { it.toString() }
+
+            withContext(Dispatchers.Main) {
+                adapter.submitList(llistaNoms)
             }
         }
     }
 
-    private class ArrayAdaptarEstable(
-        context: Context,
-        textViewResourceId: Int,
-        objects: List<String>
-    ) : ArrayAdapter<String>(context, textViewResourceId, objects) {
+    private class AlumneAdapter(
+        private val onItemClick: (String) -> Unit
+    ) : ListAdapter<String, AlumneAdapter.AlumneViewHolder>(AlumneDiffCallback) {
 
-        private val mIdMap = HashMap<String, Int>()
+        class AlumneViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
 
-        init {
-            objects.forEachIndexed { i, s -> mIdMap[s] = i }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlumneViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(android.R.layout.simple_list_item_1, parent, false) as TextView
+            return AlumneViewHolder(view)
         }
 
-        override fun getItemId(position: Int): Long = mIdMap[getItem(position)]?.toLong() ?: 0L
-        override fun hasStableIds(): Boolean = true
+        override fun onBindViewHolder(holder: AlumneViewHolder, position: Int) {
+            val item = getItem(position)
+            holder.textView.text = item
+            holder.textView.setOnClickListener { onItemClick(item) }
+        }
+    }
+
+    private object AlumneDiffCallback : DiffUtil.ItemCallback<String>() {
+        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean = oldItem == newItem
+        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean = oldItem == newItem
     }
 }
-

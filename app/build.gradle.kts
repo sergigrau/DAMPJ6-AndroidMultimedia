@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.services) // 👈 Cambiado a alias para mantener coherencia
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -16,6 +16,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -37,10 +41,8 @@ android {
 }
 
 dependencies {
-    // Firebase BoM (IMPORTANTE: Debe ir PRIMERO en las dependencias de Firebase)
+    // Firebase BoM
     implementation(platform(libs.firebase.bom))
-
-    // Librerías de Firebase (sin especificar versión, la gestiona el BoM)
     implementation(libs.firebase.database)
 
     // AndroidX & UI
@@ -48,6 +50,30 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.recyclerview)
+
+    // Jetpack Lifecycle & Coroutines
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+
+    // Jetpack WorkManager
+    implementation(libs.work.runtime.ktx)
+
+    // Jetpack Media3
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.session)
+    implementation(libs.media3.ui)
+
+    // Jetpack CameraX
+    implementation(libs.camera.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+
+    // Jetpack Navigation
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
 
     // Testing
     testImplementation(libs.junit)

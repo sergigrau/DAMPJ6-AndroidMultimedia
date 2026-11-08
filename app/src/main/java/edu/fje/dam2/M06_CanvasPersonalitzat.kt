@@ -3,24 +3,25 @@ package edu.fje.dam2
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import edu.fje.dam2.databinding.M06CanvasPersonalitzatPrincipalBinding
 
 /**
- * Classe que demostra el funcionament de Canvas amb Vistes personalitzades.
+ * Classe que demostra el funcionament de Canvas amb Vistes personalitzades
+ * i ViewBinding de Jetpack.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M06_CanvasPersonalitzat : AppCompatActivity() {
 
+    private lateinit var binding: M06CanvasPersonalitzatPrincipalBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m06_canvas_personalitzat_principal)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        binding = M06CanvasPersonalitzatPrincipalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        val vistaPropia: M06_VistaPropia = findViewById(R.id.vista)
-        vistaPropia.setColor(Color.RED)
+        binding.contingut.vista.setColor(Color.RED)
     }
 }
-

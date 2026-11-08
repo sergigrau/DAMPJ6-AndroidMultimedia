@@ -1,55 +1,44 @@
 package edu.fje.dam2
 
-import android.annotation.SuppressLint
-import android.app.Fragment
-import android.app.FragmentManager
-import android.app.FragmentTransaction
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
+import edu.fje.dam2.databinding.M17FragmentsBinding
 
 /**
- * Classe que demostra el funcionament dels fragments amb Android.
+ * Classe que demostra el funcionament dels fragments amb Jetpack Fragment KTX.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 (API 33) 19.04.2026
+ * @version 7.0 (API 36) 2026
  */
-@Suppress("DEPRECATION")
-@SuppressLint("ValidFragment")
 class M17_FragmentsActivity : AppCompatActivity(), M17_DetallFragmentActivity.OnNomAfegitListener {
 
     companion object {
         val CURSOS = ArrayList<String>()
     }
 
-    private lateinit var ll: LinearLayout
-
-    override fun onAttachFragment(fragment: Fragment) {
-        if (fragment is M17_DetallFragmentActivity) {
-            fragment.setOnNomAfegitListener(this)
-        }
-    }
+    private lateinit var binding: M17FragmentsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m17_fragments)
-        ll = findViewById(R.id.elLayout)
+        binding = M17FragmentsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        CURSOS.add("DAW2")
-        CURSOS.add("DAM2")
+        setSupportActionBar(binding.toolbar)
+        if (CURSOS.isEmpty()) {
+            CURSOS.add("DAW2")
+            CURSOS.add("DAM2")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -60,30 +49,34 @@ class M17_FragmentsActivity : AppCompatActivity(), M17_DetallFragmentActivity.On
     override fun onNomAfegit(nom: String) {
         CURSOS.add(nom)
         Log.v("DAM", CURSOS.toString())
-        val llistaFragment = fragmentManager.findFragmentById(R.id.contenidorFragmentLlista) as? M17_LlistaFragmentActivity
+        val llistaFragment = supportFragmentManager.findFragmentById(R.id.contenidorFragmentLlista) as? M17_LlistaFragmentActivity
         llistaFragment?.afegirNom(nom)
     }
 
-    @Suppress("DEPRECATION")
     class FragmentInterna : Fragment() {
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.m17_fragment_detall2, container, false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
         return when (item.itemId) {
             R.id.afegirLlista -> {
-                transaction.replace(R.id.contenidorFragmentLlista, M17_LlistaFragmentActivity())
-                transaction.commit(); true
+                supportFragmentManager.commit {
+                    replace(R.id.contenidorFragmentLlista, M17_LlistaFragmentActivity())
+                }
+                true
             }
             R.id.afegirDetall -> {
-                transaction.replace(R.id.contenidorFragmentDetall, M17_DetallFragmentActivity())
-                transaction.commit(); true
+                supportFragmentManager.commit {
+                    replace(R.id.contenidorFragmentDetall, M17_DetallFragmentActivity())
+                }
+                true
             }
             R.id.canviarDetall -> {
-                transaction.replace(R.id.contenidorFragmentDetall, FragmentInterna())
-                transaction.commit(); true
+                supportFragmentManager.commit {
+                    replace(R.id.contenidorFragmentDetall, FragmentInterna())
+                }
+                true
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -94,17 +87,16 @@ class M17_FragmentsActivity : AppCompatActivity(), M17_DetallFragmentActivity.On
         val lp = CoordinatorLayout.LayoutParams(
             CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT
         )
-        ll.layoutParams = lp
+        binding.elLayout.layoutParams = lp
         when (novaConfiguracio.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
                 Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show()
-                ll.orientation = LinearLayout.HORIZONTAL
+                binding.elLayout.orientation = android.widget.LinearLayout.HORIZONTAL
             }
             Configuration.ORIENTATION_PORTRAIT -> {
                 Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show()
-                ll.orientation = LinearLayout.VERTICAL
+                binding.elLayout.orientation = android.widget.LinearLayout.VERTICAL
             }
         }
     }
 }
-

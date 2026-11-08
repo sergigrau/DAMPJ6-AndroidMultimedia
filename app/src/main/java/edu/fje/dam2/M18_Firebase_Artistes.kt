@@ -3,24 +3,21 @@ package edu.fje.dam2
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.Spinner
 import android.widget.Toast
-import androidx.annotation.NonNull
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import edu.fje.dam2.databinding.M18FirebaseBinding
+import kotlinx.coroutines.launch
 
 /**
- * Activity que accedeix a Firebase per a afegir i mostrar artistes.
+ * Activity que utilitza l'arquitectura MVVM amb Jetpack ViewModel i StateFlow
+ * per a la gestió d'artistes a Firebase Realtime Database.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M18_Firebase_Artistes : AppCompatActivity() {
 
@@ -29,61 +26,45 @@ class M18_Firebase_Artistes : AppCompatActivity() {
         const val ID = "dam2.fje.edu.id"
     }
 
-    private lateinit var nom: EditText
-    private lateinit var genere: Spinner
-    private lateinit var afegirArtista: Button
-    private lateinit var llistaArtistes: ListView
-    private val artistes = mutableListOf<M18_Artista>()
-    private lateinit var DBArtistes: DatabaseReference
+    private lateinit var binding: M18FirebaseBinding
+    private val viewModel: M18_ArtistesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m18_firebase)
-        DBArtistes = FirebaseDatabase.getInstance().getReference("artistes")
-        nom = findViewById(R.id.editNom)
-        genere = findViewById(R.id.generes)
-        llistaArtistes = findViewById(R.id.llistaArtistes)
-        afegirArtista = findViewById(R.id.afegirArtistes)
+        binding = M18FirebaseBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        afegirArtista.setOnClickListener { afegirArtista() }
-        llistaArtistes.setOnItemClickListener { _, _, i, _ ->
-            val artist = artistes[i]
-            val intent = Intent(applicationContext, M18_Firebase_Artistes::class.java)
-            intent.putExtra(ID, artist.id)
-            intent.putExtra(NOM, artist.nom)
-            startActivity(intent)
+        binding.afegirArtistes.setOnClickListener { afegirArtista() }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.artistes.collect { llista ->
+                    binding.llistaArtistes.adapter = M18_Llista(this@M18_Firebase_Artistes, llista.toMutableList())
+
+                    binding.llistaArtistes.setOnItemClickListener { _, _, i, _ ->
+                        if (i in llista.indices) {
+                            val artist = llista[i]
+                            val intent = Intent(applicationContext, M18_Firebase_Artistes::class.java).apply {
+                                putExtra(ID, artist.id)
+                                putExtra(NOM, artist.nom)
+                            }
+                            startActivity(intent)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        DBArtistes.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                artistes.clear()
-                for (postSnapshot in dataSnapshot.children) {
-                    val artista = postSnapshot.getValue(M18_Artista::class.java)
-                    artista?.let { artistes.add(it) }
-                }
-                llistaArtistes.adapter = M18_Llista(this@M18_Firebase_Artistes, artistes)
-            }
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
-    }
-
     private fun afegirArtista() {
-        val nomText = nom.text.toString().trim()
-        val genereText = genere.selectedItem.toString()
+        val nomText = binding.editNom.text.toString().trim()
+        val genereText = binding.generes.selectedItem.toString()
         if (!TextUtils.isEmpty(nomText)) {
-            val id = DBArtistes.push().key
-            if (id != null) {
-                val artista = M18_Artista(id, nomText, genereText)
-                DBArtistes.child(id).setValue(artista)
-            }
-            nom.setText("")
-            Toast.makeText(this, "Artista afegit", Toast.LENGTH_LONG).show()
+            viewModel.afegirArtista(nomText, genereText)
+            binding.editNom.setText("")
+            Toast.makeText(this, "Artista afegit amb MVVM i StateFlow", Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, "Cal entrar un nom", Toast.LENGTH_LONG).show()
         }
     }
 }
-

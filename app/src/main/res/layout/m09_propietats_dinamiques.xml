@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".M07_CanvasPath">
+    tools:context=".M09_Propietats_dinamiques">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -13,7 +13,9 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/m09_propietats_dinamiques_continguts" />
+    <include
+        android:id="@+id/contingut"
+        layout="@layout/m09_propietats_dinamiques_continguts" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

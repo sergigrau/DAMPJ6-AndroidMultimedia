@@ -6,22 +6,25 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.WindowMetrics
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import edu.fje.dam2.databinding.M11AnimacioRequadreBinding
 
 /**
- * Classe que implementa una animació seqüencial.
+ * Classe que implementa una animació seqüencial utilitzant ViewBinding de Jetpack.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M11_AnimacioRequadre : AppCompatActivity() {
 
+    private lateinit var binding: M11AnimacioRequadreBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m11_animacio_requadre)
+        binding = M11AnimacioRequadreBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val boto: Button = findViewById(R.id.boto)
+        val boto = binding.boto
         val metrics: WindowMetrics = windowManager.currentWindowMetrics
         val bounds = metrics.bounds
         val alcada = bounds.height()
@@ -45,4 +48,3 @@ class M11_AnimacioRequadre : AppCompatActivity() {
         }
     }
 }
-

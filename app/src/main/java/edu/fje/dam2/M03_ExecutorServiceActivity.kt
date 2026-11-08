@@ -8,49 +8,48 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import androidx.lifecycle.lifecycleScope
+import edu.fje.dam2.databinding.M03AsyntaskBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
- * Activity que permet demostrar el funcionament d'un Servei.
- * Utilitza un ExecutorService per executar tasques en segon pla.
+ * Activity que permet demostrar l'execució de tasques en segon pla
+ * utilitzant Kotlin Coroutines amb Jetpack Lifecycle Scope.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M03_ExecutorServiceActivity : AppCompatActivity() {
 
+    private lateinit var binding: M03AsyntaskBinding
     private val valors = ArrayList<String>()
     private var comptador = 0
     private lateinit var adaptador: ArrayAdapter<String>
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m03_asyntask)
-
-        val boto: Button = findViewById(R.id.boto)
-        val llista: ListView = findViewById(R.id.llista)
+        binding = M03AsyntaskBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         valors.add("A")
         adaptador = ArrayAdapter(this, android.R.layout.simple_list_item_1, valors)
-        llista.adapter = adaptador
+        binding.llista.adapter = adaptador
 
         val bounds: Rect = windowManager.currentWindowMetrics.bounds
         val amplada = bounds.width()
         val alcada = bounds.height()
 
-        boto.setOnClickListener {
-            val animacio1 = ObjectAnimator.ofFloat(boto, "x", 0f, (amplada - boto.width).toFloat())
+        binding.boto.setOnClickListener {
+            val animacio1 = ObjectAnimator.ofFloat(binding.boto, "x", 0f, (amplada - binding.boto.width).toFloat())
             animacio1.duration = 1000
-            val animacio2 = ObjectAnimator.ofFloat(boto, "y", 0f, (alcada - boto.height).toFloat())
+            val animacio2 = ObjectAnimator.ofFloat(binding.boto, "y", 0f, (alcada - binding.boto.height).toFloat())
             animacio2.duration = 1000
-            val animacio3 = ObjectAnimator.ofFloat(boto, "x", (amplada - boto.width).toFloat(), 0f)
+            val animacio3 = ObjectAnimator.ofFloat(binding.boto, "x", (amplada - binding.boto.width).toFloat(), 0f)
             animacio3.duration = 1000
-            val animacio4 = ObjectAnimator.ofFloat(boto, "y", (alcada - boto.height).toFloat(), 0f)
+            val animacio4 = ObjectAnimator.ofFloat(binding.boto, "y", (alcada - binding.boto.height).toFloat(), 0f)
             animacio4.duration = 1000
 
             val animacio = AnimatorSet()
@@ -58,7 +57,7 @@ class M03_ExecutorServiceActivity : AppCompatActivity() {
             animacio.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(a: Animator) {
                     super.onAnimationEnd(a)
-                    executarTasca()
+                    executarTascaCorrutina()
                     animacio.start()
                 }
             })
@@ -66,20 +65,14 @@ class M03_ExecutorServiceActivity : AppCompatActivity() {
         }
     }
 
-    private fun executarTasca() {
-        executor.execute {
-            val resultat = comptador++.toString()
-            runOnUiThread {
+    private fun executarTascaCorrutina() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val resultat = (comptador++).toString()
+            withContext(Dispatchers.Main) {
                 Log.v("DAM2", resultat)
                 valors.add(resultat)
                 adaptador.notifyDataSetChanged()
             }
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        executor.shutdown()
-    }
 }
-

@@ -1,20 +1,19 @@
 package edu.fje.dam2
 
-import android.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import androidx.fragment.app.Fragment
 
 /**
  * Fragment que mostra la llista de cursos.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 (API 33) 19.04.2026
+ * @version 6.0 (API 36) 19.04.2026
  */
-@Suppress("DEPRECATION")
 class M17_LlistaFragmentActivity : Fragment() {
 
     private lateinit var llista: ListView
@@ -32,4 +31,3 @@ class M17_LlistaFragmentActivity : Fragment() {
         itemsAdapter.notifyDataSetChanged()
     }
 }
-

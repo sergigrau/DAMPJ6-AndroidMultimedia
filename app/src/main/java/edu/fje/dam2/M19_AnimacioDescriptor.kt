@@ -3,27 +3,27 @@ package edu.fje.dam2
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import edu.fje.dam2.databinding.M11AnimacioRequadreBinding
 
 /**
- * Classe que demostra el funcionament de les animacions des d'un fitxer descriptor.
+ * Classe que demostra el funcionament de les animacions des d'un fitxer descriptor XML
+ * utilitzant ViewBinding de Jetpack.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 (API 33) 19.04.2026
+ * @version 7.0 (API 36) 2026
  */
 class M19_AnimacioDescriptor : AppCompatActivity() {
 
+    private lateinit var binding: M11AnimacioRequadreBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m11_animacio_requadre)
-
-        val boto: Button = findViewById(R.id.boto)
+        binding = M11AnimacioRequadreBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val set = AnimatorInflater.loadAnimator(this, R.animator.animacio) as AnimatorSet
-        set.setTarget(boto)
+        set.setTarget(binding.boto)
         set.start()
     }
 }
-

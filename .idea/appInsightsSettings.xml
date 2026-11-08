@@ -6,6 +6,14 @@
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="edu.fje.dam2" />
+                  <option name="mobileSdkAppId" value="1:186976894751:android:1405fc7b2b7f26ef5f7a2a" />
+                  <option name="projectId" value="dam2-2526-60a38" />
+                  <option name="projectNumber" value="186976894751" />
+                </ConnectionSetting>
+              </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />

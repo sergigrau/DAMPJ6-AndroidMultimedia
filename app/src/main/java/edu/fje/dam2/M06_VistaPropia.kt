@@ -1,35 +1,30 @@
 package edu.fje.dam2
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.withStyledAttributes
 
 /**
- * Classe que demostra el funcionament de Canvas. Dibuixa directament sobre una View.
+ * Custom View utilitzant les extensions de Jetpack Core KTX (withStyledAttributes).
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private var xPos: Float = 0f
     private var yPos: Float = 0f
     var cadena: String? = null
-    private var color: Int = 0
+    private var color: Int = Color.RED
 
     init {
-        val a: TypedArray = context.theme.obtainStyledAttributes(
-            attrs, R.styleable.M06_VistaPropia, 0, 0
-        )
-        try {
-            xPos = a.getFloat(R.styleable.M06_VistaPropia_x, 0f)
-            cadena = a.getString(R.styleable.M06_VistaPropia_cadena)
-        } finally {
-            a.recycle()
+        context.withStyledAttributes(attrs, R.styleable.M06_VistaPropia) {
+            xPos = getFloat(R.styleable.M06_VistaPropia_x, 0f)
+            cadena = getString(R.styleable.M06_VistaPropia_cadena)
         }
     }
 
@@ -51,4 +46,3 @@ class M06_VistaPropia(context: Context, attrs: AttributeSet) : View(context, att
     fun getColor(): Int = color
     fun setColor(c: Int) { color = c }
 }
-

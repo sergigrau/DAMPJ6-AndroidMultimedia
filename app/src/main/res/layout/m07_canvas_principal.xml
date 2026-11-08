@@ -13,8 +13,9 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/m07_canvas_contingut" />
-
+    <include
+        android:id="@+id/contingut"
+        layout="@layout/m07_canvas_contingut" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

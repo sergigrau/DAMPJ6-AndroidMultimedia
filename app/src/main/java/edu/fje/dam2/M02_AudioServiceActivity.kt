@@ -6,56 +6,51 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import edu.fje.dam2.databinding.M01AudioPrincipalBinding
 
 /**
- * Activitat que mostra el funcionament de la
- * classe MediaPlayer amb un IntentService.
+ * Activitat que controla la reproducció d'àudio en segon pla utilitzant
+ * Jetpack Media3 MediaSessionService.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M02_AudioServiceActivity : AppCompatActivity() {
 
-    private val isReproduint = false
-    private lateinit var intent: Intent
+    private lateinit var binding: M01AudioPrincipalBinding
+    private var isReproduint = false
+    private lateinit var serviceIntent: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = M01AudioPrincipalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        intent = Intent(this, M02_AudioIntentService::class.java)
-        intent.putExtra("operacio", "inici")
-        startService(intent)
+        serviceIntent = Intent(this, M02_AudioIntentService::class.java)
 
-        setContentView(R.layout.m01_audio_principal)
-        val barraProgress: SeekBar = findViewById(R.id.barraProgress)
-
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setImageResource(android.R.drawable.ic_media_pause)
-        fab.setOnClickListener { view ->
+        binding.fab.setImageResource(android.R.drawable.ic_media_play)
+        binding.fab.setOnClickListener { view ->
             val text: String
             if (!isReproduint) {
-                text = "Pausant Audio"
-                fab.setImageResource(android.R.drawable.ic_media_play)
-                intent.putExtra("operacio", "inici")
-                startService(intent)
+                text = "Reproduint Àudio amb Media3 Service"
+                binding.fab.setImageResource(android.R.drawable.ic_media_pause)
+                serviceIntent.putExtra("operacio", "inici")
+                startService(serviceIntent)
+                isReproduint = true
             } else {
-                text = "Reproduint Audio"
-                fab.setImageResource(android.R.drawable.ic_media_pause)
-                intent.putExtra("operacio", "pausa")
-                startService(intent)
+                text = "Pausant Àudio amb Media3 Service"
+                binding.fab.setImageResource(android.R.drawable.ic_media_play)
+                serviceIntent.putExtra("operacio", "pausa")
+                startService(serviceIntent)
+                isReproduint = false
             }
-            Snackbar.make(view, text, Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            Snackbar.make(view, text, Snackbar.LENGTH_LONG).show()
         }
 
-        barraProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {}
+        binding.barraProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {}
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
@@ -71,4 +66,3 @@ class M02_AudioServiceActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 }
-

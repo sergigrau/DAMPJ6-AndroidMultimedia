@@ -1,92 +1,53 @@
-# M01 – Reproducció d'Àudio amb MediaPlayer
+# M01 – Reproducció d'Àudio amb Jetpack Media3 ExoPlayer
 
 ## Objectiu
-Aprendre a reproduir un fitxer d'àudio des d'una Activity utilitzant `MediaPlayer` i gestionar el focus d'àudio del sistema per coexistir correctament amb altres aplicacions que utilitzin àudio.
+Aprendre a reproduir un fitxer d'àudio des d'una Activitat utilitzant **Jetpack Media3 ExoPlayer**, gestionant automàticament el focus d'àudio del sistema i la interfície amb **ViewBinding**.
 
 ## Fitxers Involucrats
 | Fitxer | Descripció |
 |--------|------------|
-| `M01_AudioActivity.kt` | Activity principal amb controls de reproducció |
+| `M01_AudioActivity.kt` | Activity principal amb controls de reproducció Media3 |
 | `res/raw/m02_audio1` | Fitxer d'àudio a reproduir |
 | `res/layout/m01_audio_principal.xml` | Layout amb Toolbar, SeekBar i FloatingActionButton |
-| `res/menu/m01_menu.xml` | Menú d'opcions |
 
 ## Conceptes Clau
 
-### MediaPlayer
-`MediaPlayer` és la classe principal d'Android per reproduir àudio i vídeo. En aquest exercici es crea a partir d'un recurs `raw`:
+### Jetpack Media3 ExoPlayer
+**Jetpack Media3** és la suite recomanada oficialment per Google per a reproducció multimèdia. Substitueix el vell `MediaPlayer` per un motor modern, extensible i robust:
 
 ```kotlin
-mp = MediaPlayer.create(this, R.raw.m02_audio1)
-```
-
-**Mètodes principals:**
-| Mètode | Descripció |
-|--------|------------|
-| `start()` | Inicia o reprèn la reproducció |
-| `pause()` | Pausa la reproducció |
-| `stop()` | Atura la reproducció |
-| `release()` | Allibera els recursos del sistema |
-| `seekTo(ms)` | Salta a la posició indicada (en ms) |
-| `isPlaying` | Retorna `true` si s'està reproduint |
-| `duration` | Durada total en ms |
-
-### AudioFocus
-La gestió del focus d'àudio és necessària per respectar el comportament del sistema quan altres aplicacions volen utilitzar l'àudio (p. ex. una trucada entrant):
-
-```kotlin
-val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
-    .setAudioAttributes(audioAttributes)
-    .setOnAudioFocusChangeListener(mAudioFocusListener)
+val audioAttributes = AudioAttributes.Builder()
+    .setUsage(C.USAGE_MEDIA)
+    .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
     .build()
 
-val result = am.requestAudioFocus(audioFocusRequest)
+player = ExoPlayer.Builder(this)
+    .setAudioAttributes(audioAttributes, true) // true = gestió automàtica d'AudioFocus
+    .build().apply {
+        val uri = Uri.parse("android.resource://$packageName/${R.raw.m02_audio1}")
+        setMediaItem(MediaItem.fromUri(uri))
+        prepare()
+    }
 ```
 
-**Esdeveniments de focus:**
-| Constant | Acció recomanada |
-|----------|------------------|
-| `AUDIOFOCUS_GAIN` | Reprendre la reproducció a volum normal |
-| `AUDIOFOCUS_LOSS` | Aturar i alliberar el MediaPlayer |
-| `AUDIOFOCUS_LOSS_TRANSIENT` | Pausar temporalment |
-| `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK` | Baixar el volum (`setVolume(0.5f, 0.5f)`) |
+### Gestió Automàtica d'AudioFocus
+A diferència de `MediaPlayer`, passar `true` a `setAudioAttributes(audioAttributes, handleAudioFocus = true)` fa que Media3 gestioni automàticament les pauses, reduccions de volum (ducking) i meandres del focus d'àudio quan hi ha trucades o altres apps reproduint so.
 
-### SeekBar
-Permet a l'usuari saltar a qualsevol punt de la pista:
-
+### Escoltar Esdeveniments de Reproducció (Player.Listener)
 ```kotlin
-barraProgress.max = mp!!.duration
-barraProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-    override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-        mp?.seekTo(barraProgress.progress)
+player?.addListener(object : Player.Listener {
+    override fun onPlaybackStateChanged(state: Int) {
+        if (state == Player.STATE_READY) {
+            binding.barraProgress.max = duration.toInt()
+        }
     }
-    // ...
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        val iconRes = if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
+        binding.fab.setImageResource(iconRes)
+    }
 })
 ```
-
-## Diagrama de Flux
-
-```
-onCreate()
-    |
-    +-- Crea MediaPlayer (R.raw.m02_audio1)
-    +-- Sol·licita AudioFocus
-    |       |
-    |       +-- CONCEDIT -> mp.start()
-    |       +-- FALLADA  -> mp.stop()
-    |
-    +-- Clic al FAB
-            +-- isPlaying -> pause()
-            +-- !isPlaying -> start()
-```
-
-## Permisos Requerits
-Cap. El fitxer d'àudio és un recurs intern de l'aplicació (`res/raw/`).
-
-## Notes Importants
-- Allibereu sempre el `MediaPlayer` quan no s'utilitzi (`release()`) per evitar fuites de memòria.
-- `MediaPlayer.create()` prepara el reproductor automàticament (crida `prepare()` internament).
-- `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK` significa que l'àudio pot coexistir amb altres sons a volum reduït.
 
 ---
 [Home](Home) | [M02](M02-Audio-Service)

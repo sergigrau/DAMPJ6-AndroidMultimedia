@@ -1,33 +1,33 @@
 package edu.fje.dam2
 
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import edu.fje.dam2.databinding.M14ImatgesSdBinding
 
 /**
- * Activity que permet seleccionar una imatge de la galeria d'imatges del dispositiu.
+ * Activity que utilitza el Photo Picker de Jetpack (PickVisualMedia)
+ * per a seleccionar imatges de la galeria de manera segura.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 (API 33) 19.04.2026
+ * @version 7.0 (API 36) 2026
  */
 class M14_ImatgeDeSDActivity : AppCompatActivity() {
 
-    private lateinit var imageView: ImageView
+    private lateinit var binding: M14ImatgesSdBinding
 
-    private val seleccioImatgeLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK && result.data != null) {
-                val seleccio: Uri? = result.data!!.data
+    private val pickVisualMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest> =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
+            if (uri != null) {
                 try {
-                    val inputStream = seleccio?.let { contentResolver.openInputStream(it) }
-                    val imatge = BitmapFactory.decodeStream(inputStream)
-                    imageView.setImageBitmap(imatge)
+                    contentResolver.openInputStream(uri)?.use { inputStream ->
+                        val bitmap = BitmapFactory.decodeStream(inputStream)
+                        binding.imageView1.setImageBitmap(bitmap)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -36,11 +36,11 @@ class M14_ImatgeDeSDActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m14_imatges_sd)
+        binding = M14ImatgesSdBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        imageView = findViewById(R.id.imageView1)
-        val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        seleccioImatgeLauncher.launch(i)
+        pickVisualMediaLauncher.launch(
+            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        )
     }
 }
-

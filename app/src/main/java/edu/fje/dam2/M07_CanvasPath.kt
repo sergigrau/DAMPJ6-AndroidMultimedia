@@ -1,36 +1,37 @@
 package edu.fje.dam2
 
-import android.os.Bundle
 import android.graphics.Rect
+import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import edu.fje.dam2.databinding.M07CanvasPrincipalBinding
 
 /**
- * Activitat que mostra el funcionament de Canvas, fa ús de Paint i Path.
+ * Activitat que mostra el funcionament de Canvas utilitzant ViewBinding de Jetpack.
  *
  * @author sergi.grau@fje.edu
- * @version 6.0 27.01.2026
+ * @version 7.0 (API 36) 2026
  */
 class M07_CanvasPath : AppCompatActivity() {
 
+    private lateinit var binding: M07CanvasPrincipalBinding
     private lateinit var vistaPaint: M07_VistaPaint
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.m07_canvas_principal)
+        binding = M07CanvasPrincipalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val toolbar: Toolbar? = findViewById(R.id.toolbar)
-        toolbar?.let { setSupportActionBar(it) }
+        setSupportActionBar(binding.toolbar)
 
-        vistaPaint = findViewById(R.id.paintView)
+        vistaPaint = binding.contingut.paintView
         val bounds: Rect = windowManager.currentWindowMetrics.bounds
-        val metrics = DisplayMetrics()
-        metrics.widthPixels = bounds.width()
-        metrics.heightPixels = bounds.height()
+        val metrics = DisplayMetrics().apply {
+            widthPixels = bounds.width()
+            heightPixels = bounds.height()
+        }
         vistaPaint.init(metrics)
     }
 
@@ -48,4 +49,3 @@ class M07_CanvasPath : AppCompatActivity() {
         }
     }
 }
-

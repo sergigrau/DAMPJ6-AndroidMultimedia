@@ -1,6 +1,20 @@
-# M11 – Sequential Animation with AnimatorSet
+# M11 – Animació Seqüencial amb AnimatorSet i ViewBinding
 
-See the full documentation on the [M10 – Basic Animation](M10-Animacio-Basica) page, where M10 and M11 are covered together.
+## Objectiu
+Combinar múltiples instàncies d'`ObjectAnimator` en seqüència utilitzant `AnimatorSet` i **ViewBinding** per crear animacions cícliques.
+
+## Fitxers Involucrats
+| Fitxer | Descripció |
+|--------|------------|
+| `M11_AnimacioRequadre.kt` | Activity principal |
+
+## Conceptes Clau
+
+```kotlin
+val animSet = AnimatorSet()
+animSet.playSequentially(anim1, anim2, anim3, anim4)
+animSet.start()
+```
 
 ---
 [M10](M10-Animacio-Basica) | [Home](Home) | [M12](M12-Camera-Intent)
